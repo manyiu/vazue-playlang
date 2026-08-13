@@ -1,0 +1,20 @@
+{
+  "name": "@playlang/runtime-ruby",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@playlang/runtime-core": "workspace:*",
+    "@ruby/wasm-wasi": "2.10.1"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

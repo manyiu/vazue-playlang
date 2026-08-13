@@ -1,6 +1,6 @@
 import type { LanguageInfo } from "./types.ts";
 
-export const DEFAULT_TIMEOUT_MS = 8_000;
+export const DEFAULT_TIMEOUT_MS = 30_000;
 
 export const LANGUAGES: LanguageInfo[] = [
   {
@@ -76,9 +76,8 @@ print(2 + 2)
     name: "Ruby",
     monacoLanguage: "ruby",
     engine: "ruby.wasm",
-    version: "coming",
-    status: "coming",
-    reason: "Official ruby.wasm WASI build is planned for launch.",
+    version: "3.4",
+    status: "available",
     guestNetwork: false,
     examplePath: "main.rb",
     example: `puts "Hello, Playlang"
@@ -90,9 +89,8 @@ puts 2 + 2
     name: "PHP",
     monacoLanguage: "php",
     engine: "php-wasm",
-    version: "coming",
-    status: "coming",
-    reason: "PHP WASM is planned for launch.",
+    version: "8.4",
+    status: "available",
     guestNetwork: true,
     examplePath: "main.php",
     example: `<?php

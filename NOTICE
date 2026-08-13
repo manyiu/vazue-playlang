@@ -16,7 +16,7 @@ and keep this NOTICE updated:
 - Pyodide 314.0.4 — MPL-2.0 (https://github.com/pyodide/pyodide), loaded from jsDelivr
 - wasmoon / Lua 5.4 — MIT
 - sql.js / SQLite — MIT / public domain
-- ruby.wasm — BSD-2-Clause / Ruby [planned]
-- php-wasm / WordPress Playground — GPL-2.0-or-later [planned]
+- ruby.wasm 3.4 (@ruby/wasm-wasi 2.10.1) — MIT / Ruby, WASM from jsDelivr
+- php-wasm 0.1.0 (PHP 8.4 via PhpWeb; WASM from jsDelivr) — Apache-2.0
 
 Forks that vendor WASM blobs must retain the corresponding license texts.

@@ -9,6 +9,8 @@ describe("language catalog", () => {
     expect(ids).toContain("python");
     expect(ids).toContain("lua");
     expect(ids).toContain("sql");
+    expect(ids).toContain("ruby");
+    expect(ids).toContain("php");
     expect(ids).not.toContain("rust");
   });
 

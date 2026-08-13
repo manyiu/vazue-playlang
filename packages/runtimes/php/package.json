@@ -1,0 +1,20 @@
+{
+  "name": "@playlang/runtime-php",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@playlang/runtime-core": "workspace:*",
+    "php-wasm": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

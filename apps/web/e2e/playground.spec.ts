@@ -32,7 +32,7 @@ test("runs TypeScript from a share link", async ({ page }) => {
     },
   });
   await page.goto(`/#${hash}`);
-  await expect(page.getByTestId("language-typescript")).toBeVisible();
+  await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   await expect(page.getByTestId("output")).toContainText("42", { timeout: 20_000 });
 });
@@ -68,6 +68,7 @@ test("runs Lua from a share link", async ({ page }) => {
     files: { "main.lua": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
   });
   await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
     timeout: 30_000,
@@ -81,6 +82,7 @@ test("runs SQL from a share link", async ({ page }) => {
     files: { "query.sql": "SELECT 'Hello, Playlang' AS greeting;" },
   });
   await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
     timeout: 30_000,
@@ -95,6 +97,37 @@ test("runs Python from a share link", async ({ page }) => {
     files: { "main.py": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
   });
   await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 90_000,
+  });
+});
+
+test("runs Ruby from a share link", async ({ page }) => {
+  test.setTimeout(120_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "ruby",
+    files: { "main.rb": 'puts "Hello, Playlang"\nputs 2 + 2\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 90_000,
+  });
+});
+
+test("runs PHP from a share link", async ({ page }) => {
+  test.setTimeout(120_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "php",
+    files: { "main.php": '<?php\necho "Hello, Playlang\\n";\necho 2 + 2;\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
     timeout: 90_000,

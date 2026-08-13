@@ -10,27 +10,7 @@ import {
   type LanguageInfo,
   type RunResult,
 } from "@playlang/runtime-core";
-import {
-  javascriptRuntime,
-  typescriptRuntime,
-} from "@playlang/runtime-browser-script";
-import { pythonRuntime } from "@playlang/runtime-python";
-import { luaRuntime } from "@playlang/runtime-lua";
-import { sqlRuntime } from "@playlang/runtime-sql";
-
-const runtimes = {
-  javascript: javascriptRuntime,
-  typescript: typescriptRuntime,
-  python: pythonRuntime,
-  lua: luaRuntime,
-  sql: sqlRuntime,
-} as const;
-
-type RuntimeId = keyof typeof runtimes;
-
-function isRuntimeId(id: string): id is RuntimeId {
-  return id in runtimes;
-}
+import { isRuntimeId, loadRuntime } from "./runtimes.ts";
 
 function filesFor(language: LanguageInfo): Record<string, string> {
   return { [language.examplePath]: language.example };
@@ -59,7 +39,7 @@ export function App() {
 
   useEffect(() => {
     if (!isRuntimeId(language.id)) return;
-    void runtimes[language.id].load();
+    void loadRuntime(language.id).then((runtime) => runtime.load());
   }, [language.id]);
 
   const selectLanguage = (next: LanguageInfo) => {
@@ -74,7 +54,7 @@ export function App() {
     setRunning(true);
     setResult(null);
     try {
-      const runtime = runtimes[language.id];
+      const runtime = await loadRuntime(language.id);
       await runtime.load();
       const next = await runtime.run({
         languageId: language.id,
@@ -227,6 +207,8 @@ export function App() {
             </p>
             {!runnable ? (
               <p className="text-white/50">{language.reason}</p>
+            ) : running ? (
+              <p className="text-white/40">Running…</p>
             ) : result ? (
               <>
                 {result.stdout ? (

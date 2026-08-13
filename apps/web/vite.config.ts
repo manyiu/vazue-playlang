@@ -25,8 +25,14 @@ export default defineConfig({
       "@playlang/runtime-python",
       "@playlang/runtime-lua",
       "@playlang/runtime-sql",
+      "@playlang/runtime-ruby",
+      "@playlang/runtime-php",
       "@playlang/runtime-browser-script",
+      "php-wasm",
     ],
   },
-  assetsInclude: ["**/*.wasm"],
+  assetsInclude: ["**/*.wasm", "**/*.data"],
+  build: {
+    chunkSizeWarningLimit: 2500,
+  },
 });

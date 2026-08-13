@@ -1,4 +1,4 @@
-/** Shared WASI + virtual FS host. Filled in when Ruby and other WASI guests land. */
+/** Shared types for WASI-style guests. Ruby currently uses DefaultRubyVM (embeds a WASI shim). */
 
 export type WasiIo = {
   stdout: string;
@@ -7,4 +7,9 @@ export type WasiIo = {
 
 export function emptyWasiIo(): WasiIo {
   return { stdout: "", stderr: "" };
+}
+
+export function appendLine(target: string[], chunk: string): void {
+  if (!chunk) return;
+  target.push(chunk);
 }
