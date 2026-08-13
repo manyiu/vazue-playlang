@@ -12,9 +12,9 @@ and keep this NOTICE updated:
 - TypeScript — Apache-2.0 (https://github.com/microsoft/TypeScript)
 - Monaco Editor — MIT (https://github.com/microsoft/monaco-editor)
 - lz-string — MIT (https://github.com/pieroxy/lz-string)
-- Pyodide — MPL-2.0 (https://github.com/pyodide/pyodide) [planned]
-- wasmoon / Lua — MIT [planned]
-- SQLite — public domain [planned]
+- Pyodide 314.0.4 — MPL-2.0 (https://github.com/pyodide/pyodide), loaded from jsDelivr
+- wasmoon / Lua 5.4 — MIT
+- sql.js / SQLite — MIT / public domain
 - ruby.wasm — BSD-2-Clause / Ruby [planned]
 - php-wasm / WordPress Playground — GPL-2.0-or-later [planned]
 

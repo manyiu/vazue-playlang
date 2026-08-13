@@ -14,10 +14,16 @@ import {
   javascriptRuntime,
   typescriptRuntime,
 } from "@playlang/runtime-browser-script";
+import { pythonRuntime } from "@playlang/runtime-python";
+import { luaRuntime } from "@playlang/runtime-lua";
+import { sqlRuntime } from "@playlang/runtime-sql";
 
 const runtimes = {
   javascript: javascriptRuntime,
   typescript: typescriptRuntime,
+  python: pythonRuntime,
+  lua: luaRuntime,
+  sql: sqlRuntime,
 } as const;
 
 type RuntimeId = keyof typeof runtimes;
@@ -50,6 +56,11 @@ export function App() {
   const entry = language.examplePath;
   const source = files[entry] ?? "";
   const runnable = language.status === "available" && isRuntimeId(language.id);
+
+  useEffect(() => {
+    if (!isRuntimeId(language.id)) return;
+    void runtimes[language.id].load();
+  }, [language.id]);
 
   const selectLanguage = (next: LanguageInfo) => {
     setLanguageId(next.id);

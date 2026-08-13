@@ -20,4 +20,13 @@ export default defineConfig({
   worker: {
     format: "es",
   },
+  optimizeDeps: {
+    exclude: [
+      "@playlang/runtime-python",
+      "@playlang/runtime-lua",
+      "@playlang/runtime-sql",
+      "@playlang/runtime-browser-script",
+    ],
+  },
+  assetsInclude: ["**/*.wasm"],
 });

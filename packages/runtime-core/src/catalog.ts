@@ -38,9 +38,8 @@ console.log("2 + 2 =", 2 + 2);
     name: "Python",
     monacoLanguage: "python",
     engine: "Pyodide",
-    version: "coming",
-    status: "coming",
-    reason: "Next: CPython in WebAssembly (Pyodide).",
+    version: "314.0.4",
+    status: "available",
     guestNetwork: true,
     examplePath: "main.py",
     example: `print("Hello, Playlang")
@@ -52,9 +51,8 @@ print(2 + 2)
     name: "Lua",
     monacoLanguage: "lua",
     engine: "wasmoon",
-    version: "coming",
-    status: "coming",
-    reason: "Lua 5.4 WASM is next after Python.",
+    version: "5.4",
+    status: "available",
     guestNetwork: false,
     examplePath: "main.lua",
     example: `print("Hello, Playlang")
@@ -66,12 +64,11 @@ print(2 + 2)
     name: "SQL",
     monacoLanguage: "sql",
     engine: "SQLite",
-    version: "coming",
-    status: "coming",
-    reason: "In-memory SQLite WASM is planned for launch.",
+    version: "3",
+    status: "available",
     guestNetwork: false,
     examplePath: "query.sql",
-    example: `SELECT 'Hello, Playlang' AS greeting;
+    example: `SELECT 'Hello, Playlang' AS greeting, 2 + 2 AS sum;
 `,
   },
   {

@@ -51,6 +51,7 @@ test("sandbox cannot read parent cookies", async ({ page }) => {
     },
   });
   await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
   await page.evaluate(() => {
     document.cookie = "playlang_secret=should-not-leak";
   });
@@ -58,6 +59,46 @@ test("sandbox cannot read parent cookies", async ({ page }) => {
   const output = page.getByTestId("output");
   await expect(output).toContainText(/COOKIE(=|_BLOCKED)/, { timeout: 15_000 });
   await expect(output).not.toContainText("should-not-leak");
+});
+
+test("runs Lua from a share link", async ({ page }) => {
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "lua",
+    files: { "main.lua": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 30_000,
+  });
+});
+
+test("runs SQL from a share link", async ({ page }) => {
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "sql",
+    files: { "query.sql": "SELECT 'Hello, Playlang' AS greeting;" },
+  });
+  await page.goto(`/#${hash}`);
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 30_000,
+  });
+});
+
+test("runs Python from a share link", async ({ page }) => {
+  test.setTimeout(120_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "python",
+    files: { "main.py": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 90_000,
+  });
 });
 
 test("Copy link writes a hash URL that round-trips", async ({ page, context }) => {

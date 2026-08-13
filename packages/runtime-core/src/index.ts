@@ -9,3 +9,4 @@ export {
   SHARE_MAX_BYTES,
 } from "./share.ts";
 export { withTimeout, capOutput, MAX_OUTPUT_BYTES } from "./timeout.ts";
+export { entrySource } from "./files.ts";

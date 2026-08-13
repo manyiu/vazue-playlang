@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import { LANGUAGES, availableLanguages, languageById } from "./catalog.ts";
 
 describe("language catalog", () => {
-  it("marks javascript and typescript as available", () => {
+  it("marks launch languages as available", () => {
     const ids = availableLanguages().map((language) => language.id);
     expect(ids).toContain("javascript");
     expect(ids).toContain("typescript");
+    expect(ids).toContain("python");
+    expect(ids).toContain("lua");
+    expect(ids).toContain("sql");
     expect(ids).not.toContain("rust");
   });
 

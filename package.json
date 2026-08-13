@@ -12,7 +12,7 @@
     "build": "pnpm --filter @playlang/web build",
     "preview": "pnpm --filter @playlang/web preview",
     "test": "pnpm test:unit && pnpm test:e2e",
-    "test:unit": "pnpm --filter @playlang/runtime-core test",
+    "test:unit": "pnpm --filter @playlang/runtime-core test && pnpm --filter @playlang/runtime-sql test",
     "test:e2e": "pnpm --filter @playlang/web test:e2e",
     "typecheck": "pnpm -r typecheck"
   },
