@@ -20,5 +20,6 @@ and keep this NOTICE updated:
 - php-wasm 0.1.0 (PHP 8.4 via PhpWeb; WASM from jsDelivr) — Apache-2.0
 - yaegi-wasm 1.0.2 (Yaegi Go interpreter in WASM; binaries from jsDelivr) — ISC / Yaegi Apache-2.0
 - webR 0.5.8 (R 4.5.1 in WebAssembly; binaries from webr.r-wasm.org) — see LICENCE.md
+- WasmSharp / @wasmsharp/core 0.10.2 (Roslyn + .NET browser runtime for C#; packaged via @wasmsharp/vite-plugin) — Apache-2.0
 
 Forks that vendor WASM blobs must retain the corresponding license texts.

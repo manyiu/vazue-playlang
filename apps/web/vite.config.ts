@@ -1,9 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import wasmSharp from "@wasmsharp/vite-plugin";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), ...wasmSharp()],
   server: {
     port: 5173,
     headers: {
@@ -29,12 +30,14 @@ export default defineConfig({
       "@playlang/runtime-php",
       "@playlang/runtime-go",
       "@playlang/runtime-r",
+      "@playlang/runtime-csharp",
       "@playlang/runtime-browser-script",
       "php-wasm",
       "webr",
+      "@wasmsharp/core",
     ],
   },
-  assetsInclude: ["**/*.wasm", "**/*.data", "**/*.dat"],
+  assetsInclude: ["**/*.wasm", "**/*.data", "**/*.dat", "**/*.dll"],
   build: {
     chunkSizeWarningLimit: 2500,
     target: "esnext",

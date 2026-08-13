@@ -1,8 +1,8 @@
 # Playlang
 
 In-browser programming playground. JavaScript, TypeScript, Python (Pyodide),
-Lua, SQLite, Ruby, PHP, Go (Yaegi), and R (webR) run in your tab. Vazue does
-not execute or receive your code.
+Lua, SQLite, Ruby, PHP, Go (Yaegi), R (webR), and C# (WasmSharp) run in your
+tab. Vazue does not execute or receive your code.
 
 Planned public URL: [playlang.vazue.com](https://playlang.vazue.com)
 

@@ -135,10 +135,9 @@ print(2 + 2)
     name: "C#",
     monacoLanguage: "csharp",
     engine: "WasmSharp",
-    version: "coming",
-    status: "coming",
-    reason: "Roslyn-in-browser works, but Vite packaging for .dll assets still needs polish.",
-    guestNetwork: false,
+    version: "14",
+    status: "available",
+    guestNetwork: true,
     examplePath: "Program.cs",
     example: `using System;
 

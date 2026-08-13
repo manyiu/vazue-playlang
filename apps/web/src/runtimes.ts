@@ -10,6 +10,7 @@ const runtimeIds = [
   "php",
   "go",
   "r",
+  "csharp",
 ] as const;
 
 export type RuntimeId = (typeof runtimeIds)[number];
@@ -61,6 +62,10 @@ export function loadRuntime(id: RuntimeId): Promise<RuntimeAdapter> {
       case "r": {
         const mod = await import("@playlang/runtime-r");
         return mod.rRuntime;
+      }
+      case "csharp": {
+        const mod = await import("@playlang/runtime-csharp");
+        return mod.csharpRuntime;
       }
       default: {
         const _exhaustive: never = id;

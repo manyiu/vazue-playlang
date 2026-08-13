@@ -13,7 +13,7 @@ describe("language catalog", () => {
     expect(ids).toContain("php");
     expect(ids).toContain("go");
     expect(ids).toContain("r");
-    expect(ids).not.toContain("csharp");
+    expect(ids).toContain("csharp");
     expect(ids).not.toContain("rust");
   });
 
