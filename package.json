@@ -1,0 +1,22 @@
+{
+  "name": "playlang",
+  "private": true,
+  "description": "Browser WASM programming-language playground",
+  "license": "MIT",
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @playlang/web dev",
+    "build": "pnpm --filter @playlang/web build",
+    "preview": "pnpm --filter @playlang/web preview",
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "test:unit": "pnpm --filter @playlang/runtime-core test",
+    "test:e2e": "pnpm --filter @playlang/web test:e2e",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

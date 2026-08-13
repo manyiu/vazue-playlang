@@ -1,0 +1,17 @@
+{
+  "name": "@playlang/runtime-browser-script",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@playlang/runtime-core": "workspace:*",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,21 @@
+Playlang
+Copyright 2026 Vazue
+
+This product is licensed under the MIT License (see LICENSE).
+
+Third-party runtimes loaded in the browser (version-pinned, not bundled unless noted)
+are subject to their own licenses. Do not assume they are MIT.
+
+When a language adapter is enabled, attribute the engine in the UI (engine + version)
+and keep this NOTICE updated:
+
+- TypeScript — Apache-2.0 (https://github.com/microsoft/TypeScript)
+- Monaco Editor — MIT (https://github.com/microsoft/monaco-editor)
+- lz-string — MIT (https://github.com/pieroxy/lz-string)
+- Pyodide — MPL-2.0 (https://github.com/pyodide/pyodide) [planned]
+- wasmoon / Lua — MIT [planned]
+- SQLite — public domain [planned]
+- ruby.wasm — BSD-2-Clause / Ruby [planned]
+- php-wasm / WordPress Playground — GPL-2.0-or-later [planned]
+
+Forks that vendor WASM blobs must retain the corresponding license texts.
