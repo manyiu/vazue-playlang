@@ -103,9 +103,8 @@ echo 2 + 2;
     name: "Go",
     monacoLanguage: "go",
     engine: "Yaegi",
-    version: "coming",
-    status: "coming",
-    reason: "After launch: interpreter compiled to WASM (not the Go compiler).",
+    version: "1.25",
+    status: "available",
     guestNetwork: false,
     examplePath: "main.go",
     example: `package main
@@ -114,6 +113,7 @@ import "fmt"
 
 func main() {
 	fmt.Println("Hello, Playlang")
+	fmt.Println(2 + 2)
 }
 `,
   },
@@ -122,9 +122,8 @@ func main() {
     name: "R",
     monacoLanguage: "r",
     engine: "webR",
-    version: "coming",
-    status: "coming",
-    reason: "After launch: webR in a worker.",
+    version: "4.5.1",
+    status: "available",
     guestNetwork: true,
     examplePath: "main.R",
     example: `print("Hello, Playlang")
@@ -135,13 +134,16 @@ print(2 + 2)
     id: "csharp",
     name: "C#",
     monacoLanguage: "csharp",
-    engine: ".NET WASM",
+    engine: "WasmSharp",
     version: "coming",
     status: "coming",
-    reason: "After launch: Roslyn in the browser (large download).",
+    reason: "Roslyn-in-browser works, but Vite packaging for .dll assets still needs polish.",
     guestNetwork: false,
     examplePath: "Program.cs",
-    example: `Console.WriteLine("Hello, Playlang");
+    example: `using System;
+
+Console.WriteLine("Hello, Playlang");
+Console.WriteLine(2 + 2);
 `,
   },
   {

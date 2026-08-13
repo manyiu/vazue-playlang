@@ -11,6 +11,9 @@ describe("language catalog", () => {
     expect(ids).toContain("sql");
     expect(ids).toContain("ruby");
     expect(ids).toContain("php");
+    expect(ids).toContain("go");
+    expect(ids).toContain("r");
+    expect(ids).not.toContain("csharp");
     expect(ids).not.toContain("rust");
   });
 

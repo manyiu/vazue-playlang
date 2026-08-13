@@ -27,12 +27,17 @@ export default defineConfig({
       "@playlang/runtime-sql",
       "@playlang/runtime-ruby",
       "@playlang/runtime-php",
+      "@playlang/runtime-go",
+      "@playlang/runtime-r",
       "@playlang/runtime-browser-script",
       "php-wasm",
+      "webr",
+      "yaegi-wasm",
     ],
   },
-  assetsInclude: ["**/*.wasm", "**/*.data"],
+  assetsInclude: ["**/*.wasm", "**/*.data", "**/*.dat"],
   build: {
     chunkSizeWarningLimit: 2500,
+    target: "esnext",
   },
 });

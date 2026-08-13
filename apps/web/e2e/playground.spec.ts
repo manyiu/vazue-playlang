@@ -134,6 +134,39 @@ test("runs PHP from a share link", async ({ page }) => {
   });
 });
 
+test("runs Go from a share link", async ({ page }) => {
+  test.setTimeout(180_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "go",
+    files: {
+      "main.go":
+        'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("Hello, Playlang")\n\tfmt.Println(2 + 2)\n}\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 150_000,
+  });
+});
+
+test("runs R from a share link", async ({ page }) => {
+  test.setTimeout(180_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "r",
+    files: { "main.R": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 150_000,
+  });
+});
+
 test("Copy link writes a hash URL that round-trips", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const { hash } = encodeShare({

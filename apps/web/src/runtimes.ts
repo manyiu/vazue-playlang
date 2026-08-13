@@ -8,6 +8,8 @@ const runtimeIds = [
   "sql",
   "ruby",
   "php",
+  "go",
+  "r",
 ] as const;
 
 export type RuntimeId = (typeof runtimeIds)[number];
@@ -51,6 +53,14 @@ export function loadRuntime(id: RuntimeId): Promise<RuntimeAdapter> {
       case "php": {
         const mod = await import("@playlang/runtime-php");
         return mod.phpRuntime;
+      }
+      case "go": {
+        const mod = await import("@playlang/runtime-go");
+        return mod.goRuntime;
+      }
+      case "r": {
+        const mod = await import("@playlang/runtime-r");
+        return mod.rRuntime;
       }
       default: {
         const _exhaustive: never = id;
