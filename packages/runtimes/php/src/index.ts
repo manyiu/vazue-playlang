@@ -1,4 +1,3 @@
-/// <reference path="./php-wasm-web.d.ts" />
 import type { RunRequest, RunResult, RuntimeAdapter } from "@playlang/runtime-core";
 import { capOutput, entrySource, withTimeout } from "@playlang/runtime-core";
 import { PhpBase } from "php-wasm/PhpBase";
@@ -10,10 +9,11 @@ type PhpWebInstance = {
   run: (code: string) => Promise<number>;
 };
 
-/** Single-version wrapper so Vite does not bundle every PhpWeb binary. */
+/** Load the PHP binary from CDN so Vite does not emit multi-MB .wasm into dist. */
 class Php84Web extends PhpBase {
   constructor() {
-    super(import("php-wasm/php8.4-web.mjs"), {
+    const binaryUrl = `${PHP_WASM_CDN_BASE}php8.4-web.mjs`;
+    super(import(/* @vite-ignore */ binaryUrl), {
       version: PHP_LANGUAGE_VERSION,
       locateFile: (path) => `${PHP_WASM_CDN_BASE}${path}`,
     });

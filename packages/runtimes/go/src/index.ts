@@ -1,8 +1,6 @@
-/// <reference path="./yaegi-assets.d.ts" />
 import type { RunRequest, RunResult, RuntimeAdapter } from "@playlang/runtime-core";
 import { capOutput, entrySource, withTimeout } from "@playlang/runtime-core";
-import wasmUrl from "yaegi-wasm/src/yaegi-browser.wasm?url";
-import wasmExecUrl from "yaegi-wasm/src/wasm_exec.js?url";
+import { YAEGI_WASM_EXEC_URL, YAEGI_WASM_URL } from "./versions.ts";
 
 type WorkerRequest =
   | { type: "init" }
@@ -11,11 +9,6 @@ type WorkerRequest =
 type WorkerResponse =
   | { type: "ready" }
   | { type: "result"; id: number; ok: boolean; stdout: string; stderr: string };
-
-function absoluteAssetUrl(asset: string): string {
-  if (/^https?:\/\//i.test(asset) || asset.startsWith("blob:")) return asset;
-  return new URL(asset, globalThis.location?.origin ?? "http://127.0.0.1").href;
-}
 
 function createWorkerSource(execUrl: string, moduleUrl: string): string {
   return `
@@ -112,13 +105,15 @@ self.onmessage = async (event) => {
 }
 
 let worker: Worker | undefined;
+let workerBlobUrl: string | undefined;
 let loadPromise: Promise<void> | undefined;
 let nextId = 1;
 
 function spawn(): Worker {
-  const source = createWorkerSource(absoluteAssetUrl(wasmExecUrl), absoluteAssetUrl(wasmUrl));
+  const source = createWorkerSource(YAEGI_WASM_EXEC_URL, YAEGI_WASM_URL);
   const blob = new Blob([source], { type: "text/javascript" });
-  const next = new Worker(URL.createObjectURL(blob));
+  workerBlobUrl = URL.createObjectURL(blob);
+  const next = new Worker(workerBlobUrl);
   worker = next;
   return next;
 }
@@ -126,6 +121,10 @@ function spawn(): Worker {
 function reset(): void {
   worker?.terminate();
   worker = undefined;
+  if (workerBlobUrl) {
+    URL.revokeObjectURL(workerBlobUrl);
+    workerBlobUrl = undefined;
+  }
   loadPromise = undefined;
 }
 

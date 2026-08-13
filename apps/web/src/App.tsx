@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import Editor from "@monaco-editor/react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import {
   DEFAULT_TIMEOUT_MS,
   LANGUAGES,
@@ -11,6 +10,10 @@ import {
   type RunResult,
 } from "@playlang/runtime-core";
 import { isRuntimeId, loadRuntime } from "./runtimes.ts";
+
+const EditorPane = lazy(() =>
+  import("./EditorPane.tsx").then((mod) => ({ default: mod.EditorPane })),
+);
 
 function filesFor(language: LanguageInfo): Record<string, string> {
   return { [language.examplePath]: language.example };
@@ -36,11 +39,6 @@ export function App() {
   const entry = language.examplePath;
   const source = files[entry] ?? "";
   const runnable = language.status === "available" && isRuntimeId(language.id);
-
-  useEffect(() => {
-    if (!isRuntimeId(language.id)) return;
-    void loadRuntime(language.id).then((runtime) => runtime.load());
-  }, [language.id]);
 
   const selectLanguage = (next: LanguageInfo) => {
     setLanguageId(next.id);
@@ -178,23 +176,22 @@ export function App() {
             ) : null}
           </div>
           <div className="min-h-0 flex-1">
-            <Editor
-              theme="vs-dark"
-              language={language.monacoLanguage}
-              path={entry}
-              value={source}
-              onChange={(value) =>
-                setFiles((current) => ({ ...current, [entry]: value ?? "" }))
+            <Suspense
+              fallback={
+                <div className="flex h-full items-center justify-center text-sm text-white/40">
+                  Loading editor…
+                </div>
               }
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                padding: { top: 12 },
-              }}
-            />
+            >
+              <EditorPane
+                language={language.monacoLanguage}
+                path={entry}
+                value={source}
+                onChange={(value) =>
+                  setFiles((current) => ({ ...current, [entry]: value }))
+                }
+              />
+            </Suspense>
           </div>
           <section
             data-testid="output"

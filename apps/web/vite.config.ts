@@ -32,7 +32,6 @@ export default defineConfig({
       "@playlang/runtime-browser-script",
       "php-wasm",
       "webr",
-      "yaegi-wasm",
     ],
   },
   assetsInclude: ["**/*.wasm", "**/*.data", "**/*.dat"],

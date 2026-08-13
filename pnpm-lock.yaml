@@ -106,9 +106,6 @@ importers:
       '@playlang/runtime-core':
         specifier: workspace:*
         version: link:../../runtime-core
-      yaegi-wasm:
-        specifier: 1.0.2
-        version: 1.0.2
     devDependencies:
       typescript:
         specifier: ^7.0.2
@@ -1532,9 +1529,6 @@ packages:
     peerDependencies:
       '@xterm/xterm': ^5.5.0 || ^6.0.0
 
-  yaegi-wasm@1.0.2:
-    resolution: {integrity: sha512-kwW6/FBm1JqimNQn0lRG4rtZZ/2Zi34u5QsP5hu6YIEzEXmiCjR1uQZMW3S9YvjHHcCQXyF16Z3DhHoJOjA8pg==}
-
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
@@ -2733,7 +2727,5 @@ snapshots:
     dependencies:
       '@xterm/xterm': 5.5.0
       string-width: 4.2.3
-
-  yaegi-wasm@1.0.2: {}
 
   yallist@3.1.1: {}
