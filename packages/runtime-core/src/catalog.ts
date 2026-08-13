@@ -23,7 +23,7 @@ console.log("2 + 2 =", 2 + 2);
     name: "TypeScript",
     monacoLanguage: "typescript",
     engine: "TypeScript",
-    version: "5.9",
+    version: "6.0.3",
     status: "available",
     guestNetwork: true,
     examplePath: "main.ts",

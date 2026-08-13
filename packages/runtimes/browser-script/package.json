@@ -12,6 +12,6 @@
   },
   "dependencies": {
     "@playlang/runtime-core": "workspace:*",
-    "typescript": "^5.9.2"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }

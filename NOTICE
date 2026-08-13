@@ -9,7 +9,8 @@ are subject to their own licenses. Do not assume they are MIT.
 When a language adapter is enabled, attribute the engine in the UI (engine + version)
 and keep this NOTICE updated:
 
-- TypeScript — Apache-2.0 (https://github.com/microsoft/TypeScript)
+- TypeScript 7 (project tooling) — Apache-2.0 (https://github.com/microsoft/TypeScript)
+- TypeScript 6 via `@typescript/typescript6` (in-browser transpile; 7.0 has no stable Compiler API yet) — Apache-2.0
 - Monaco Editor — MIT (https://github.com/microsoft/monaco-editor)
 - lz-string — MIT (https://github.com/pieroxy/lz-string)
 - Pyodide 314.0.4 — MPL-2.0 (https://github.com/pyodide/pyodide), loaded from jsDelivr
