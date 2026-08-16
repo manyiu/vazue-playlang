@@ -54,8 +54,11 @@ export function App() {
     try {
       const runtime = await loadRuntime(language.id);
       await runtime.load();
-      // C# cold-starts Roslyn + .NET WASM; allow more than the default 30s budget.
-      const timeoutMs = language.id === "csharp" ? 120_000 : DEFAULT_TIMEOUT_MS;
+      // C# / Java cold-start large WASM runtimes; allow more than the default 30s budget.
+      const timeoutMs =
+        language.id === "csharp" || language.id === "java"
+          ? 120_000
+          : DEFAULT_TIMEOUT_MS;
       const next = await runtime.run({
         languageId: language.id,
         files,

@@ -14,7 +14,23 @@ describe("language catalog", () => {
     expect(ids).toContain("go");
     expect(ids).toContain("r");
     expect(ids).toContain("csharp");
+    expect(ids).toContain("java");
     expect(ids).not.toContain("rust");
+  });
+
+  it("describes Java as CheerpJ with guest network", () => {
+    const java = languageById("java");
+    expect(java).toMatchObject({
+      id: "java",
+      name: "Java",
+      monacoLanguage: "java",
+      engine: "CheerpJ",
+      version: "17",
+      status: "available",
+      guestNetwork: true,
+      examplePath: "Main.java",
+    });
+    expect(java?.example).toMatch(/System\.out\.println\("Hello, Playlang"\)/);
   });
 
   it("gives rust a reason it cannot run in the browser yet", () => {

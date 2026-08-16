@@ -1,0 +1,22 @@
+{
+  "name": "@playlang/infra-cdk",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "synth": "cdk synth",
+    "test": "vitest run",
+    "deploy:dns": "cdk deploy PlaylangDnsCertStack",
+    "deploy:web": "cdk deploy PlaylangWebStack",
+    "deploy:all": "cdk deploy --all"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "aws-cdk": "^2.1126.0",
+    "aws-cdk-lib": "^2.259.0",
+    "constructs": "^10.6.0",
+    "tsx": "^4.22.4",
+    "typescript": "^7.0.2",
+    "vitest": "^3.2.4"
+  }
+}

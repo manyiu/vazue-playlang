@@ -31,6 +31,7 @@ export default defineConfig({
       "@playlang/runtime-go",
       "@playlang/runtime-r",
       "@playlang/runtime-csharp",
+      "@playlang/runtime-java",
       "@playlang/runtime-browser-script",
       "php-wasm",
       "webr",

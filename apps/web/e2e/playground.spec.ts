@@ -185,6 +185,60 @@ test("runs C# from a share link", async ({ page }) => {
   });
 });
 
+test("runs Java from a share link", async ({ page }) => {
+  test.setTimeout(180_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "java",
+    files: {
+      "Main.java":
+        'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Playlang");\n    System.out.println(2 + 2);\n  }\n}\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  const output = page.getByTestId("output");
+  await expect(output).toContainText("Hello, Playlang", { timeout: 150_000 });
+  await expect(output).toContainText("4");
+});
+
+test("surfaces Java compile errors", async ({ page }) => {
+  test.setTimeout(180_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "java",
+    files: {
+      "Main.java":
+        "public class Main {\n  public static void main(String[] args) {\n    System.out.println(\"broken\"\n  }\n}\n",
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  const output = page.getByTestId("output");
+  await expect(output).toContainText(/error:/i, { timeout: 150_000 });
+  await expect(output).toContainText("')' expected");
+});
+
+test("runs Java with a package declaration", async ({ page }) => {
+  test.setTimeout(180_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "java",
+    files: {
+      "Main.java":
+        'package demo;\n\npublic class Main {\n  public static void main(String[] args) {\n    System.out.println("pkg-ok");\n  }\n}\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("pkg-ok", {
+    timeout: 150_000,
+  });
+});
+
 test("Copy link writes a hash URL that round-trips", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const { hash } = encodeShare({

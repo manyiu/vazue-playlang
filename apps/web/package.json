@@ -17,6 +17,7 @@
     "@playlang/runtime-core": "workspace:*",
     "@playlang/runtime-csharp": "workspace:*",
     "@playlang/runtime-go": "workspace:*",
+    "@playlang/runtime-java": "workspace:*",
     "@playlang/runtime-lua": "workspace:*",
     "@playlang/runtime-php": "workspace:*",
     "@playlang/runtime-python": "workspace:*",

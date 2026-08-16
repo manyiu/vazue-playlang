@@ -146,6 +146,23 @@ Console.WriteLine(2 + 2);
 `,
   },
   {
+    id: "java",
+    name: "Java",
+    monacoLanguage: "java",
+    engine: "CheerpJ",
+    version: "17",
+    status: "available",
+    guestNetwork: true,
+    examplePath: "Main.java",
+    example: `public class Main {
+  public static void main(String[] args) {
+    System.out.println("Hello, Playlang");
+    System.out.println(2 + 2);
+  }
+}
+`,
+  },
+  {
     id: "cpp",
     name: "C / C++",
     monacoLanguage: "cpp",

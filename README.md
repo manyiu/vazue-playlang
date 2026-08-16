@@ -1,8 +1,8 @@
 # Playlang
 
 In-browser programming playground. JavaScript, TypeScript, Python (Pyodide),
-Lua, SQLite, Ruby, PHP, Go (Yaegi), R (webR), and C# (WasmSharp) run in your
-tab. Vazue does not execute or receive your code.
+Lua, SQLite, Ruby, PHP, Go (Yaegi), R (webR), C# (WasmSharp), and Java
+(CheerpJ) run in your tab. Vazue does not execute or receive your code.
 
 Planned public URL: [playlang.vazue.com](https://playlang.vazue.com)
 
@@ -26,7 +26,8 @@ pnpm test
 First Playwright run downloads Chromium (`pnpm --filter @playlang/web exec playwright install chromium`).
 
 
-AWS / CDK is not required to run locally. Deploy config belongs in environment
+AWS / CDK is not required to run locally. To deploy to `playlang.vazue.com`, see
+[`infra/cdk/README.md`](infra/cdk/README.md). Deploy config belongs in environment
 variables, never in git (see `.env.example`).
 
 ## Share links
