@@ -186,7 +186,7 @@ int main() {
     version: "AtomVM",
     status: "coming",
     reason:
-      "Popcorn + AtomVM in the browser (OTP subset). Wire @swmansion/popcorn as a runtime adapter.",
+      "Needs a cooked .avm eval bundle (Elixir/Mix) plus COOP/COEP for AtomVM threads.",
     guestNetwork: true,
     examplePath: "main.exs",
     example: `IO.puts("Hello, Playlang")
