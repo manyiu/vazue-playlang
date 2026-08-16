@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@playlang/runtime-core": "workspace:*",
-    "webr": "0.5.8"
+    "webr": "0.6.0"
   },
   "devDependencies": {
     "typescript": "^7.0.2"
