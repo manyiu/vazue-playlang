@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
 import { PlaylangDnsCertStack } from "../lib/dns-cert-stack";
+import { GITHUB_OWNER } from "../lib/github-config";
+import { PlaylangGithubOidcStack } from "../lib/github-oidc-stack";
 import { PlaylangWebStack } from "../lib/web-stack";
 
 const app = new cdk.App();
@@ -26,3 +28,12 @@ const webStack = new PlaylangWebStack(app, "PlaylangWebStack", {
   description: "S3 + CloudFront for Playlang playground SPA",
 });
 webStack.addDependency(dnsCertStack);
+
+const oidcStack = new PlaylangGithubOidcStack(app, "PlaylangGithubOidcStack", {
+  env,
+  webBucket: webStack.bucket,
+  distribution: webStack.distribution,
+  githubOwner: GITHUB_OWNER,
+  description: "GitHub Actions OIDC role for Playlang web deploys",
+});
+oidcStack.addDependency(webStack);

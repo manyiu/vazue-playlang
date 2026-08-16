@@ -2,6 +2,11 @@
   "name": "playlang",
   "private": true,
   "description": "Browser WASM programming-language playground",
+  "homepage": "https://playlang.vazue.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manyiu/vazue-playlang.git"
+  },
   "license": "MIT",
   "packageManager": "pnpm@10.14.0",
   "engines": {
@@ -14,9 +19,11 @@
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "pnpm --filter @playlang/runtime-core test && pnpm --filter @playlang/runtime-sql test && pnpm --filter @playlang/runtime-java test && pnpm --filter @playlang/infra-cdk test",
     "test:e2e": "pnpm --filter @playlang/web test:e2e",
+    "test:e2e:ci": "pnpm --filter @playlang/web test:e2e:ci",
     "typecheck": "pnpm -r typecheck",
     "deploy:dns": "pnpm --filter @playlang/infra-cdk deploy:dns",
-    "deploy:web": "pnpm build && pnpm --filter @playlang/infra-cdk deploy:web"
+    "deploy:web": "pnpm build && pnpm --filter @playlang/infra-cdk deploy:web",
+    "deploy:oidc": "pnpm --filter @playlang/infra-cdk deploy:oidc"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

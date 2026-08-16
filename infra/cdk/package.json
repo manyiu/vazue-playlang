@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "synth": "cdk synth",
     "test": "vitest run",
     "deploy:dns": "cdk deploy PlaylangDnsCertStack",
     "deploy:web": "cdk deploy PlaylangWebStack",
+    "deploy:oidc": "cdk deploy PlaylangGithubOidcStack --require-approval never",
     "deploy:all": "cdk deploy --all"
   },
   "devDependencies": {

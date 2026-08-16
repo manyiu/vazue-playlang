@@ -25,6 +25,9 @@ pnpm test
 
 First Playwright run downloads Chromium (`pnpm --filter @playlang/web exec playwright install chromium`).
 
+CI on GitHub runs typecheck, unit tests, and Playwright for JS/TS only. WASM
+language e2e is local. Production deploys from `main` via OIDC (see
+[`infra/cdk/README.md`](infra/cdk/README.md)); forks use their own AWS account.
 
 AWS / CDK is not required to run locally. To deploy to `playlang.vazue.com`, see
 [`infra/cdk/README.md`](infra/cdk/README.md). Deploy config belongs in environment

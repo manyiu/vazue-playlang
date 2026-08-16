@@ -1,0 +1,66 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test:unit
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Build web
+        run: pnpm build
+
+      - name: Publish dist to S3 and invalidate CloudFront
+        run: |
+          set -euo pipefail
+          BUCKET="$(aws cloudformation describe-stacks \
+            --stack-name PlaylangWebStack \
+            --query "Stacks[0].Outputs[?OutputKey=='WebBucketName'].OutputValue" \
+            --output text)"
+          DIST="$(aws cloudformation describe-stacks \
+            --stack-name PlaylangWebStack \
+            --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" \
+            --output text)"
+          aws s3 sync apps/web/dist "s3://${BUCKET}" --delete
+          aws cloudfront create-invalidation --distribution-id "${DIST}" --paths "/*"
+
+      - name: Smoke test
+        run: |
+          curl -sfI https://playlang.vazue.com/ | head -20
+          curl -sf https://playlang.vazue.com/ | grep -q "<div id=\"root\""
+          echo "Playlang web OK"

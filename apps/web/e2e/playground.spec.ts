@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { encodeShare } from "@playlang/runtime-core";
 
-test("runs the default JavaScript example", async ({ page }) => {
+test("runs the default JavaScript example", { tag: "@ci" }, async ({ page }) => {
   await page.goto("/");
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -10,7 +10,7 @@ test("runs the default JavaScript example", async ({ page }) => {
   });
 });
 
-test("loads a shared snapshot from the URL hash", async ({ page }) => {
+test("loads a shared snapshot from the URL hash", { tag: "@ci" }, async ({ page }) => {
   const { hash } = encodeShare({
     v: 1,
     languageId: "javascript",
@@ -23,7 +23,7 @@ test("loads a shared snapshot from the URL hash", async ({ page }) => {
   });
 });
 
-test("runs TypeScript from a share link", async ({ page }) => {
+test("runs TypeScript from a share link", { tag: "@ci" }, async ({ page }) => {
   const { hash } = encodeShare({
     v: 1,
     languageId: "typescript",
@@ -37,7 +37,7 @@ test("runs TypeScript from a share link", async ({ page }) => {
   await expect(page.getByTestId("output")).toContainText("42", { timeout: 20_000 });
 });
 
-test("sandbox cannot read parent cookies", async ({ page }) => {
+test("sandbox cannot read parent cookies", { tag: "@ci" }, async ({ page }) => {
   const { hash } = encodeShare({
     v: 1,
     languageId: "javascript",
@@ -239,7 +239,7 @@ test("runs Java with a package declaration", async ({ page }) => {
   });
 });
 
-test("Copy link writes a hash URL that round-trips", async ({ page, context }) => {
+test("Copy link writes a hash URL that round-trips", { tag: "@ci" }, async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const { hash } = encodeShare({
     v: 1,

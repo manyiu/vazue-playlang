@@ -20,10 +20,13 @@ const repoRoot = path.resolve(process.cwd(), "../..");
 const webDistRoot = path.join(repoRoot, "apps/web/dist");
 
 export class PlaylangWebStack extends cdk.Stack {
+  public readonly bucket: s3.Bucket;
+  public readonly distribution: cloudfront.Distribution;
+
   constructor(scope: Construct, id: string, props: SiteStackProps) {
     super(scope, id, props);
 
-    const bucket = new s3.Bucket(this, "WebBucket", {
+    this.bucket = new s3.Bucket(this, "WebBucket", {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
@@ -31,7 +34,7 @@ export class PlaylangWebStack extends cdk.Stack {
       versioned: true,
     });
 
-    const origin = origins.S3BucketOrigin.withOriginAccessControl(bucket);
+    const origin = origins.S3BucketOrigin.withOriginAccessControl(this.bucket);
     const securityHeadersPolicy = createWebSecurityHeadersPolicy(
       this,
       "WebSecurityHeaders",
@@ -42,7 +45,7 @@ export class PlaylangWebStack extends cdk.Stack {
     );
     const spaRoutingFunction = createSpaRoutingFunction(this, "SpaRouting");
 
-    const distribution = new cloudfront.Distribution(this, "WebDistribution", {
+    this.distribution = new cloudfront.Distribution(this, "WebDistribution", {
       defaultBehavior: {
         origin,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -81,7 +84,7 @@ export class PlaylangWebStack extends cdk.Stack {
       zone: props.hostedZone,
       recordName: WEB_DOMAIN,
       target: route53.RecordTarget.fromAlias(
-        new targets.CloudFrontTarget(distribution),
+        new targets.CloudFrontTarget(this.distribution),
       ),
     });
 
@@ -89,14 +92,14 @@ export class PlaylangWebStack extends cdk.Stack {
       zone: props.hostedZone,
       recordName: WEB_DOMAIN,
       target: route53.RecordTarget.fromAlias(
-        new targets.CloudFrontTarget(distribution),
+        new targets.CloudFrontTarget(this.distribution),
       ),
     });
 
     // Large dist (~55 MB with C# WasmSharp assets); raise limits for sync.
     new s3deploy.BucketDeployment(this, "DeployWeb", {
       sources: [s3deploy.Source.asset(webDistRoot)],
-      destinationBucket: bucket,
+      destinationBucket: this.bucket,
       memoryLimit: 2048,
       ephemeralStorageSize: cdk.Size.gibibytes(2),
     });
@@ -108,12 +111,12 @@ export class PlaylangWebStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, "DistributionId", {
-      value: distribution.distributionId,
+      value: this.distribution.distributionId,
       description: "CloudFront distribution id",
     });
 
     new cdk.CfnOutput(this, "WebBucketName", {
-      value: bucket.bucketName,
+      value: this.bucket.bucketName,
       description: "Private S3 origin bucket",
     });
   }

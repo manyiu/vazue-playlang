@@ -54,6 +54,7 @@ pnpm deploy:web
 | `CDK_DEFAULT_REGION` | `us-east-1` | CloudFront + ACM region |
 | `DOMAIN` | `playlang.vazue.com` | CloudFront alias + cert |
 | `HOSTED_ZONE_NAME` | `vazue.com` | Route 53 lookup |
+| `GITHUB_OWNER` | `manyiu` | OIDC trust: all repos under this GitHub account |
 
 Copy `.env.example` to `.env.local` for local overrides. Never commit real account IDs.
 
@@ -71,11 +72,43 @@ CloudFront response headers policy sets:
 ```text
 PlaylangDnsCertStack
   └── PlaylangWebStack
+        └── PlaylangGithubOidcStack
 ```
 
-## GitHub Actions (later)
+## GitHub Actions
 
-OIDC deploy for web-only updates on `main` — not included in this first local deploy path.
+PR and `main` CI (`.github/workflows/ci.yml`) run typecheck, unit tests, and
+Playwright on **JS/TS only** (`@ci` tag). WASM language e2e stays local/nightly.
+
+Web publishes (`.github/workflows/deploy-web.yml`) run on push to `main` via
+**GitHub OIDC** — no AWS access keys in git or in GitHub Secrets.
+
+| Piece | Value |
+| --- | --- |
+| IAM role | `PlaylangWebDeploy` (`PlaylangGithubOidcStack`) |
+| Trust | `repo:manyiu/*:*` (every repo under the personal GitHub account) |
+| Permissions | Web bucket read/write, CloudFront invalidation, `DescribeStacks` on `PlaylangWebStack` |
+| GitHub | Environment `production` (restricted to `main`) + secret `AWS_ROLE_ARN` |
+
+Forks outside `manyiu` cannot assume the role. Infra changes (DNS, CloudFront, cert) stay on
+`pnpm deploy:dns` / `pnpm deploy:web` from a local AWS SSO session.
+
+### First-time OIDC setup
+
+1. Public repo `manyiu/vazue-playlang` (or set `GITHUB_OWNER` before synth)
+2. Account already has an OIDC provider for `token.actions.githubusercontent.com` (Vazue: `GithubActionsOidcStack` in aws-common-cdk)
+3. From repo root, with AWS SSO:
+
+```bash
+export CDK_DEFAULT_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+export CDK_DEFAULT_REGION=us-east-1
+pnpm deploy:oidc
+```
+
+4. Copy output `WebDeployRoleArn` into GitHub Environment secret `AWS_ROLE_ARN` on `production`.
+
+CI deploys with `aws s3 sync` + invalidation, not `cdk deploy`, so the role does
+not need CloudFormation update rights.
 
 ## Rollback
 
