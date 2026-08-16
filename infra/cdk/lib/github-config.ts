@@ -2,10 +2,15 @@
 export const GITHUB_OWNER = process.env.GITHUB_OWNER ?? "manyiu";
 
 /**
- * GitHub Actions OIDC `sub` pattern.
- * `repo:manyiu/*:*` allows every repository under this account (any ref / environment).
- * Must be used with IAM `StringLike`, not `StringEquals`.
+ * Numeric GitHub user/org id for immutable OIDC `sub` claims.
+ * Repos created after 2026-07-15 use `repo:login@id/repo@id:...`.
  */
-export function githubOidcSub(owner: string): string {
-  return `repo:${owner}/*:*`;
+export const GITHUB_OWNER_ID = process.env.GITHUB_OWNER_ID ?? "11912398";
+
+/**
+ * IAM `StringLike` patterns for GitHub Actions OIDC `sub`.
+ * Includes the legacy name-only claim and the immutable login@id claim.
+ */
+export function githubOidcSubs(owner: string, ownerId: string): string[] {
+  return [`repo:${owner}/*:*`, `repo:${owner}@${ownerId}/*:*`];
 }

@@ -55,6 +55,7 @@ pnpm deploy:web
 | `DOMAIN` | `playlang.vazue.com` | CloudFront alias + cert |
 | `HOSTED_ZONE_NAME` | `vazue.com` | Route 53 lookup |
 | `GITHUB_OWNER` | `manyiu` | OIDC trust: all repos under this GitHub account |
+| `GITHUB_OWNER_ID` | `11912398` | Numeric user id for immutable OIDC `sub` claims |
 
 Copy `.env.example` to `.env.local` for local overrides. Never commit real account IDs.
 
@@ -86,7 +87,7 @@ Web publishes (`.github/workflows/deploy-web.yml`) run on push to `main` via
 | Piece | Value |
 | --- | --- |
 | IAM role | `PlaylangWebDeploy` (`PlaylangGithubOidcStack`) |
-| Trust | `repo:manyiu/*:*` (every repo under the personal GitHub account) |
+| Trust | `repo:manyiu/*:*` and `repo:manyiu@11912398/*:*` (legacy + immutable OIDC `sub`) |
 | Permissions | Web bucket read/write, CloudFront invalidation, `DescribeStacks` on `PlaylangWebStack` |
 | GitHub | Environment `production` (restricted to `main`) + secret `AWS_ROLE_ARN` |
 
