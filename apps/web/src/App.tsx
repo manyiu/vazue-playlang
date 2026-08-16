@@ -36,7 +36,14 @@ export function App() {
   const [shareCopied, setShareCopied] = useState(false);
 
   const language = languageById(languageId) ?? initialLanguage;
-  const entry = language.examplePath;
+  const entry = useMemo(() => {
+    if (files[language.examplePath] !== undefined) return language.examplePath;
+    if (shared?.entrypoint && files[shared.entrypoint] !== undefined) {
+      return shared.entrypoint;
+    }
+    const keys = Object.keys(files);
+    return keys[0] ?? language.examplePath;
+  }, [files, language.examplePath, shared?.entrypoint]);
   const source = files[entry] ?? "";
   const runnable = language.status === "available" && isRuntimeId(language.id);
 
@@ -54,11 +61,13 @@ export function App() {
     try {
       const runtime = await loadRuntime(language.id);
       await runtime.load();
-      // C# / Java cold-start large WASM runtimes; allow more than the default 30s budget.
+      // C# / Java / C++ cold-start large WASM toolchains; allow more than the default 30s budget.
       const timeoutMs =
         language.id === "csharp" || language.id === "java"
           ? 120_000
-          : DEFAULT_TIMEOUT_MS;
+          : language.id === "cpp"
+            ? 180_000
+            : DEFAULT_TIMEOUT_MS;
       const next = await runtime.run({
         languageId: language.id,
         files,

@@ -23,5 +23,7 @@ and keep this NOTICE updated:
 - WasmSharp / @wasmsharp/core 0.10.2 (Roslyn + .NET browser runtime for C#; packaged via @wasmsharp/vite-plugin) — Apache-2.0
 - CheerpJ 4.3 (Java SE runtime in WebAssembly; loaded from cjrtnc.leaningtech.com under the CheerpJ Community License for FOSS) — see https://cheerpj.com/licensing/
 - OpenJDK tools.jar (javac used with CheerpJ; served from this origin as /tools.jar) — GPL-2.0-with-classpath-exception
+- browsercc 0.1.1 (Clang/LLD + WASI sysroot for C/C++; loaded from jsDelivr) — MIT
+- @bjorn3/browser_wasi_shim 0.4.2 (WASI host for browsercc output; loaded from jsDelivr) — MIT OR Apache-2.0
 
 Forks that vendor WASM blobs must retain the corresponding license texts.

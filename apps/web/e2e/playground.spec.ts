@@ -239,6 +239,43 @@ test("runs Java with a package declaration", async ({ page }) => {
   });
 });
 
+test("runs C++ from a share link", async ({ page }) => {
+  test.setTimeout(240_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "cpp",
+    files: {
+      "main.cpp":
+        '#include <iostream>\nint main() {\n  std::cout << "Hello, Playlang" << std::endl;\n  std::cout << 2 + 2 << std::endl;\n}\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  const output = page.getByTestId("output");
+  await expect(output).toContainText("Hello, Playlang", { timeout: 200_000 });
+  await expect(output).toContainText("4");
+});
+
+test("runs C from a share link", async ({ page }) => {
+  test.setTimeout(240_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "cpp",
+    files: {
+      "main.c":
+        '#include <stdio.h>\nint main(void) {\n  puts("Hello, Playlang");\n  printf("%d\\n", 2 + 2);\n  return 0;\n}\n',
+    },
+    entrypoint: "main.c",
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  const output = page.getByTestId("output");
+  await expect(output).toContainText("Hello, Playlang", { timeout: 200_000 });
+  await expect(output).toContainText("4");
+});
+
 test("Copy link writes a hash URL that round-trips", { tag: "@ci" }, async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const { hash } = encodeShare({

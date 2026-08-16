@@ -1,10 +1,14 @@
 # Playlang
 
 In-browser programming playground. JavaScript, TypeScript, Python (Pyodide),
-Lua, SQLite, Ruby, PHP, Go (Yaegi), R (webR), C# (WasmSharp), and Java
-(CheerpJ) run in your tab. Vazue does not execute or receive your code.
+Lua, SQLite, Ruby, PHP, Go (Yaegi), R (webR), C# (WasmSharp), Java (CheerpJ),
+and C/C++ (browsercc) run in your tab. Vazue does not execute or receive your
+code.
 
-Planned public URL: [playlang.vazue.com](https://playlang.vazue.com)
+Coming next: Elixir (Popcorn/AtomVM). Rust, Swift, and Haskell are omitted —
+no product-ready in-browser compile-and-run path yet.
+
+Live at [playlang.vazue.com](https://playlang.vazue.com)
 
 ## Local development
 

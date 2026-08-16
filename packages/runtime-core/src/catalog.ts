@@ -166,68 +166,28 @@ Console.WriteLine(2 + 2);
     id: "cpp",
     name: "C / C++",
     monacoLanguage: "cpp",
-    engine: "experimental",
-    version: "n/a",
-    status: "unavailable",
-    reason: "Needs a full compiler in the tab — not practical for v1.",
-    guestNetwork: false,
+    engine: "browsercc",
+    version: "0.1.1",
+    status: "available",
+    guestNetwork: true,
     examplePath: "main.cpp",
     example: `#include <iostream>
 int main() {
-  std::cout << "Hello, Playlang\\n";
+  std::cout << "Hello, Playlang" << std::endl;
+  std::cout << 2 + 2 << std::endl;
 }
-`,
-  },
-  {
-    id: "rust",
-    name: "Rust",
-    monacoLanguage: "rust",
-    engine: "none",
-    version: "n/a",
-    status: "unavailable",
-    reason: "Needs rustc + Cargo in the browser — too large today.",
-    guestNetwork: false,
-    examplePath: "main.rs",
-    example: `fn main() {
-    println!("Hello, Playlang");
-}
-`,
-  },
-  {
-    id: "swift",
-    name: "Swift",
-    monacoLanguage: "swift",
-    engine: "none",
-    version: "n/a",
-    status: "unavailable",
-    reason: "SwiftWasm compiles apps to WASM; shipping swiftc in the tab is not practical.",
-    guestNetwork: false,
-    examplePath: "main.swift",
-    example: `print("Hello, Playlang")
-`,
-  },
-  {
-    id: "haskell",
-    name: "Haskell",
-    monacoLanguage: "plaintext",
-    engine: "none",
-    version: "n/a",
-    status: "unavailable",
-    reason: "GHC WASM is a tech preview — no browser GHCi playground yet.",
-    guestNetwork: false,
-    examplePath: "Main.hs",
-    example: `main = putStrLn "Hello, Playlang"
 `,
   },
   {
     id: "elixir",
     name: "Elixir",
-    monacoLanguage: "plaintext",
-    engine: "none",
-    version: "n/a",
-    status: "unavailable",
-    reason: "OTP-in-browser is still experimental (AtomVM subset).",
-    guestNetwork: false,
+    monacoLanguage: "elixir",
+    engine: "Popcorn",
+    version: "AtomVM",
+    status: "coming",
+    reason:
+      "Popcorn + AtomVM in the browser (OTP subset). Wire @swmansion/popcorn as a runtime adapter.",
+    guestNetwork: true,
     examplePath: "main.exs",
     example: `IO.puts("Hello, Playlang")
 `,

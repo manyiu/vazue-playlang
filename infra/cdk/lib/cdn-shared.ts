@@ -20,7 +20,8 @@ export const CHEERPJ_CDN_ORIGIN = "https://cjrtnc.leaningtech.com";
 export function playlangContentSecurityPolicy(): string {
   return [
     "default-src 'self'",
-    `script-src 'self' blob: 'wasm-unsafe-eval' ${CHEERPJ_CDN_ORIGIN}`,
+    // jsDelivr: PHP / Ruby / browsercc (and other) ES modules loaded at runtime.
+    `script-src 'self' blob: 'wasm-unsafe-eval' ${CHEERPJ_CDN_ORIGIN} https://cdn.jsdelivr.net`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",

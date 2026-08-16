@@ -15,7 +15,8 @@ describe("language catalog", () => {
     expect(ids).toContain("r");
     expect(ids).toContain("csharp");
     expect(ids).toContain("java");
-    expect(ids).not.toContain("rust");
+    expect(ids).toContain("cpp");
+    expect(ids).not.toContain("elixir");
   });
 
   it("describes Java as CheerpJ with guest network", () => {
@@ -33,10 +34,25 @@ describe("language catalog", () => {
     expect(java?.example).toMatch(/System\.out\.println\("Hello, Playlang"\)/);
   });
 
-  it("gives rust a reason it cannot run in the browser yet", () => {
-    const rust = languageById("rust");
-    expect(rust?.status).toBe("unavailable");
-    expect(rust?.reason).toMatch(/Cargo/i);
+  it("describes C/C++ as browsercc and keeps Elixir as coming", () => {
+    expect(languageById("cpp")).toMatchObject({
+      status: "available",
+      engine: "browsercc",
+      version: "0.1.1",
+      guestNetwork: true,
+      examplePath: "main.cpp",
+    });
+    expect(languageById("elixir")).toMatchObject({
+      status: "coming",
+      engine: "Popcorn",
+      monacoLanguage: "elixir",
+    });
+  });
+
+  it("drops languages that cannot ship as real browser runtimes yet", () => {
+    expect(languageById("rust")).toBeUndefined();
+    expect(languageById("swift")).toBeUndefined();
+    expect(languageById("haskell")).toBeUndefined();
   });
 
   it("has unique ids", () => {

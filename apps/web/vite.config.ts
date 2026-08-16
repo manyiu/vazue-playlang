@@ -32,6 +32,7 @@ export default defineConfig({
       "@playlang/runtime-r",
       "@playlang/runtime-csharp",
       "@playlang/runtime-java",
+      "@playlang/runtime-cpp",
       "@playlang/runtime-browser-script",
       "php-wasm",
       "webr",
