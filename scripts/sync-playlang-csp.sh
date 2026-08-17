@@ -6,7 +6,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-CSP="$(pnpm exec tsx -e "import { playlangContentSecurityPolicy } from './infra/cdk/lib/playlang-security.ts'; process.stdout.write(playlangContentSecurityPolicy());")"
+CSP="$(
+  pnpm --filter @playlang/infra-cdk exec tsx -e \
+    "import { playlangContentSecurityPolicy } from './lib/playlang-security.ts'; process.stdout.write(playlangContentSecurityPolicy());"
+)"
 
 mapfile -t POLICY_IDS < <(
   aws cloudformation describe-stack-resources \
@@ -19,6 +22,8 @@ if ((${#POLICY_IDS[@]} == 0)); then
   echo "No CloudFront response header policies found on PlaylangWebStack" >&2
   exit 1
 fi
+
+echo "Syncing CSP onto ${#POLICY_IDS[@]} response header policies"
 
 for policy_id in "${POLICY_IDS[@]}"; do
   echo "Updating CSP on response headers policy ${policy_id}"
