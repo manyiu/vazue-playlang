@@ -34,6 +34,19 @@ describe("deriveMainClass", () => {
   });
 });
 
+describe("CheerpJ credentialless iframes", () => {
+  it("marks only CheerpJ CDN frames, not the JS sandbox or srcdoc", async () => {
+    const { isCheerpJIframeSrc } = await import("./credentiallessIframes.ts");
+    expect(isCheerpJIframeSrc("https://cjrtnc.leaningtech.com/4.3/c.html")).toBe(
+      true,
+    );
+    expect(isCheerpJIframeSrc("https://playlang.vazue.com/js-sandbox.html")).toBe(
+      false,
+    );
+    expect(isCheerpJIframeSrc("")).toBe(false);
+  });
+});
+
 describe("CheerpJ pins", () => {
   it("loads CheerpJ 4.3 from the Community License CDN", () => {
     expect(CHEERPJ_LOADER_URL).toBe(

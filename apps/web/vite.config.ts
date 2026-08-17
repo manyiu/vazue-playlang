@@ -10,6 +10,10 @@ import {
   PLAYLANG_COOP,
   playlangContentSecurityPolicy,
 } from "../../infra/cdk/lib/playlang-security.ts";
+import {
+  playlangVendorAlias,
+  playlangVendorRewrites,
+} from "./vite-plugins/playlang-vendor.ts";
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(webRoot, "../..");
@@ -64,12 +68,16 @@ const previewSecurityHeaders = {
 
 export default defineConfig({
   plugins: [
+    playlangVendorRewrites(),
     react(),
     tailwindcss(),
     ...wasmSharp(),
     popcorn({ bundlePaths: [elixirBundle] }),
     playlangSecurityHeaders(),
   ],
+  resolve: {
+    alias: playlangVendorAlias,
+  },
   server: {
     port: 5173,
     // Listen on all interfaces so both localhost and 127.0.0.1 work.
@@ -82,6 +90,7 @@ export default defineConfig({
   },
   worker: {
     format: "es",
+    plugins: () => [playlangVendorRewrites()],
   },
   optimizeDeps: {
     exclude: [

@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const usePreview = !!process.env.CI;
+const usePreview = !!process.env.CI || process.env.PLAYLANG_E2E_PREVIEW === "1";
 
 export default defineConfig({
   testDir: "./e2e",

@@ -37,8 +37,6 @@ export async function runInSandbox(code: string, timeoutMs: number): Promise<Run
   iframe.setAttribute("sandbox", "allow-scripts");
   iframe.setAttribute("title", "Playlang sandbox");
   iframe.style.display = "none";
-  iframe.src = new URL("js-sandbox.html", document.baseURI).href;
-  document.body.appendChild(iframe);
 
   const channel = new MessageChannel();
   let onWindowMessage: ((event: MessageEvent) => void) | undefined;
@@ -104,6 +102,7 @@ export async function runInSandbox(code: string, timeoutMs: number): Promise<Run
         channel.port2,
       ]);
     };
+    // Listen before navigating the iframe so a cached sandbox cannot miss `ready`.
     window.addEventListener("message", onWindowMessage);
 
     loadWatchdog = setTimeout(() => {
@@ -113,6 +112,9 @@ export async function runInSandbox(code: string, timeoutMs: number): Promise<Run
     iframe.addEventListener("error", () => {
       fail(new Error("Failed to load sandbox"));
     });
+
+    iframe.src = new URL("js-sandbox.html", document.baseURI).href;
+    document.body.appendChild(iframe);
   });
 
   try {

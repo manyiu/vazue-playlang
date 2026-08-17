@@ -11,10 +11,34 @@ export const RUNTIME_CONNECT_SRC = [
 
 /** CheerpJ loader origin — required in script-src (dynamic script tag). */
 export const CHEERPJ_CDN_ORIGIN = "https://cjrtnc.leaningtech.com";
+export const JSDELIVR_ORIGIN = "https://cdn.jsdelivr.net";
+export const WEBR_CDN_ORIGIN = "https://webr.r-wasm.org";
+
+/**
+ * Origins that execute scripts or spawn workers (not package-index fetches).
+ * Must appear in both script-src (importScripts / dynamic import) and
+ * worker-src (`new Worker(cdnUrl)`).
+ */
+export const RUNTIME_SCRIPT_ORIGINS = [
+  CHEERPJ_CDN_ORIGIN,
+  JSDELIVR_ORIGIN,
+  WEBR_CDN_ORIGIN,
+];
+
+/**
+ * WasmSharp ships a hardcoded Comlink URL. Do not allowlist unpkg — the Vite
+ * plugin rewrites this import to the npm `comlink` package.
+ */
+export const WASMSHARP_COMLINK_CDN =
+  "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 
 /** SharedArrayBuffer for Popcorn; credentialless keeps CheerpJ iframes workable. */
 export const PLAYLANG_COEP = "credentialless";
 export const PLAYLANG_COOP = "same-origin";
+
+function directive(name: string, values: string[]): string {
+  return `${name} ${values.join(" ")}`;
+}
 
 /**
  * CSP string applied by CloudFront and Vite preview (testable without constructing a policy).
@@ -24,15 +48,20 @@ export const PLAYLANG_COOP = "same-origin";
 export function playlangContentSecurityPolicy(): string {
   return [
     "default-src 'self'",
-    // jsDelivr: PHP / Ruby / browsercc (and other) ES modules loaded at runtime.
-    `script-src 'self' blob: 'unsafe-eval' 'wasm-unsafe-eval' ${CHEERPJ_CDN_ORIGIN} https://cdn.jsdelivr.net`,
+    directive("script-src", [
+      "'self'",
+      "blob:",
+      "'unsafe-eval'",
+      "'wasm-unsafe-eval'",
+      ...RUNTIME_SCRIPT_ORIGINS,
+    ]),
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     `connect-src 'self' ${RUNTIME_CONNECT_SRC.join(" ")}`,
-    "worker-src 'self' blob:",
+    directive("worker-src", ["'self'", "blob:", ...RUNTIME_SCRIPT_ORIGINS]),
     "child-src 'self' blob:",
-    `frame-src 'self' ${CHEERPJ_CDN_ORIGIN}`,
+    directive("frame-src", ["'self'", "blob:", CHEERPJ_CDN_ORIGIN]),
     // 'self' (not 'none'): the JS/TS runner embeds same-origin /js-sandbox.html.
     "frame-ancestors 'self'",
     "base-uri 'self'",

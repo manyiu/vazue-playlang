@@ -161,4 +161,32 @@ describe("runInSandbox", () => {
     });
     vi.useRealTimers();
   });
+
+  it("listens for ready before navigating the iframe", async () => {
+    const order: string[] = [];
+    const win = globalThis.window as {
+      addEventListener: (type: string, handler: MessageHandler) => void;
+    };
+    const originalListen = win.addEventListener;
+    win.addEventListener = (type: string, handler: MessageHandler) => {
+      if (type === "message") order.push("listen");
+      originalListen(type, handler);
+    };
+    Object.defineProperty(iframeElement, "src", {
+      configurable: true,
+      enumerable: true,
+      get: () => "",
+      set: () => {
+        order.push("src");
+      },
+    });
+
+    const runPromise = runInSandbox('console.log("hello")', 5000);
+    expect(order.indexOf("listen")).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf("src")).toBeGreaterThan(order.indexOf("listen"));
+
+    dispatchWindowMessage({ source: "playlang-sandbox", type: "ready" });
+    parentPort.dispatch({ type: "result", ok: true, stdout: "hello", stderr: "" });
+    await runPromise;
+  });
 });

@@ -56,6 +56,9 @@ importers:
       '@playlang/runtime-sql':
         specifier: workspace:*
         version: link:../../packages/runtimes/sql
+      comlink:
+        specifier: ^4.4.2
+        version: 4.4.2
       monaco-editor:
         specifier: ^0.52.2
         version: 0.52.2

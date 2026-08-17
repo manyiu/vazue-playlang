@@ -31,6 +31,84 @@ test("serves production CSP so sandboxes cannot rely on inline scripts", { tag: 
   expect(await sandboxJs.text()).toContain('source: "playlang-sandbox"');
 });
 
+test("does not fetch WasmSharp Comlink from unpkg", { tag: "@ci" }, async ({ page }) => {
+  const unpkg: string[] = [];
+  page.on("request", (req) => {
+    if (req.url().includes("unpkg.com")) unpkg.push(req.url());
+  });
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "csharp",
+    files: {
+      "Program.cs": 'using System;\nConsole.WriteLine("Hello, Playlang");\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText(
+    /Loading C#|Hello, Playlang|error|Failed/i,
+    { timeout: 8_000 },
+  );
+  expect(unpkg, unpkg.join("\n")).toEqual([]);
+  await expect(page.getByTestId("output")).not.toContainText("unpkg.com");
+});
+
+test("Popcorn iframe boot is not blocked as an inline script", { tag: "@ci" }, async ({
+  page,
+}) => {
+  const cspInline: string[] = [];
+  page.on("console", (msg) => {
+    const text = msg.text();
+    if (/Content-Security-Policy/i.test(text) && /inline/i.test(text)) {
+      cspInline.push(text);
+    }
+  });
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "elixir",
+    files: { "main.exs": 'IO.puts("Hello, Playlang")\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText(
+    /Loading Elixir|Hello, Playlang|error|Failed/i,
+    { timeout: 8_000 },
+  );
+  expect(cspInline, cspInline.join("\n")).toEqual([]);
+  await expect(page.getByTestId("output")).not.toContainText("Popcorn.Wasm.ready");
+});
+
+test("webR worker is not blocked by CSP", { tag: "@ci" }, async ({ page }) => {
+  const cspWorker: string[] = [];
+  page.on("console", (msg) => {
+    const text = msg.text();
+    if (
+      /Content-Security-Policy/i.test(text) &&
+      /webr|worker-src|script-src/i.test(text)
+    ) {
+      cspWorker.push(text);
+    }
+  });
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "r",
+    files: { "main.R": 'print("Hello, Playlang")\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText(
+    /Loading R|Hello, Playlang|error|Failed/i,
+    { timeout: 8_000 },
+  );
+  expect(cspWorker, cspWorker.join("\n")).toEqual([]);
+  await expect(page.getByTestId("output")).not.toContainText(
+    /Refused to (load|connect|create)/i,
+  );
+});
+
 test("runs the default JavaScript example", { tag: "@ci" }, async ({ page }) => {
   await page.goto("/");
   await expect(page.getByTestId("run")).toBeEnabled();

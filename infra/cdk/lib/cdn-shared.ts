@@ -9,11 +9,20 @@ import {
 
 export {
   CHEERPJ_CDN_ORIGIN,
+  JSDELIVR_ORIGIN,
   PLAYLANG_COEP,
   PLAYLANG_COOP,
   RUNTIME_CONNECT_SRC,
+  RUNTIME_SCRIPT_ORIGINS,
+  WASMSHARP_COMLINK_CDN,
+  WEBR_CDN_ORIGIN,
   playlangContentSecurityPolicy,
 } from "./playlang-security";
+export {
+  rewritePlaylangVendors,
+  rewritePopcornSrcdoc,
+  rewriteWasmSharpComlink,
+} from "./playlang-vendor";
 
 export const TLS_POLICY = cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021;
 
