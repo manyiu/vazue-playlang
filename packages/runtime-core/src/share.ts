@@ -29,7 +29,34 @@ function isSharePayload(value: unknown): value is SharePayload {
   if (record.entrypoint !== undefined && typeof record.entrypoint !== "string") {
     return false;
   }
+  if (record.stdin !== undefined && typeof record.stdin !== "string") {
+    return false;
+  }
   return true;
+}
+
+export function isShareHash(hash: string): boolean {
+  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+  return raw.startsWith(PREFIX) && raw.length > PREFIX.length;
+}
+
+export type ShareDecodeResult =
+  | { payload: SharePayload; error: null }
+  | { payload: null; error: null }
+  | { payload: null; error: "invalid_hash" };
+
+export function decodeShareWithStatus(hash: string): ShareDecodeResult {
+  if (!hash || hash === "#") {
+    return { payload: null, error: null };
+  }
+  const payload = decodeShare(hash);
+  if (payload) {
+    return { payload, error: null };
+  }
+  if (isShareHash(hash)) {
+    return { payload: null, error: "invalid_hash" };
+  }
+  return { payload: null, error: null };
 }
 
 export function encodeShare(payload: SharePayload): ShareEncodeResult {

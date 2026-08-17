@@ -11,6 +11,8 @@ export type LanguageInfo = {
   guestNetwork: boolean;
   examplePath: string;
   example: string;
+  /** User-facing hint for first-run WASM download time. */
+  coldStartHint?: string;
 };
 
 export type RunRequest = {
@@ -49,6 +51,7 @@ export type SharePayload = {
   languageId: string;
   files: Record<string, string>;
   entrypoint?: string;
+  stdin?: string;
 };
 
 export type ShareEncodeResult = {

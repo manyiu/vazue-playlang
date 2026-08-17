@@ -45,6 +45,7 @@ console.log("2 + 2 =", 2 + 2);
     example: `print("Hello, Playlang")
 print(2 + 2)
 `,
+    coldStartHint: "First run may take 15–30s while Python downloads.",
   },
   {
     id: "lua",
@@ -83,6 +84,7 @@ print(2 + 2)
     example: `puts "Hello, Playlang"
 puts 2 + 2
 `,
+    coldStartHint: "First run may take 15–30s while Ruby downloads.",
   },
   {
     id: "php",
@@ -97,6 +99,7 @@ puts 2 + 2
 echo "Hello, Playlang\\n";
 echo 2 + 2;
 `,
+    coldStartHint: "First run may take 15–30s while PHP downloads.",
   },
   {
     id: "go",
@@ -116,6 +119,7 @@ func main() {
 	fmt.Println(2 + 2)
 }
 `,
+    coldStartHint: "First run may take 30–60s while Go downloads.",
   },
   {
     id: "r",
@@ -129,6 +133,7 @@ func main() {
     example: `print("Hello, Playlang")
 print(2 + 2)
 `,
+    coldStartHint: "First run may take 30–60s while R downloads.",
   },
   {
     id: "csharp",
@@ -144,6 +149,7 @@ print(2 + 2)
 Console.WriteLine("Hello, Playlang");
 Console.WriteLine(2 + 2);
 `,
+    coldStartHint: "First run may take 30–90s while C# downloads.",
   },
   {
     id: "java",
@@ -161,6 +167,7 @@ Console.WriteLine(2 + 2);
   }
 }
 `,
+    coldStartHint: "First run may take 30–90s while Java downloads.",
   },
   {
     id: "cpp",
@@ -177,6 +184,7 @@ int main() {
   std::cout << 2 + 2 << std::endl;
 }
 `,
+    coldStartHint: "First run may take 60–180s while C/C++ downloads.",
   },
   {
     id: "elixir",
@@ -190,6 +198,7 @@ int main() {
     example: `IO.puts("Hello, Playlang")
 IO.puts(2 + 2)
 `,
+    coldStartHint: "First run may take 30–90s while Elixir downloads.",
   },
 ];
 

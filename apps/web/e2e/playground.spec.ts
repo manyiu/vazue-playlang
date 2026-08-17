@@ -94,13 +94,16 @@ test("sandbox cannot read parent cookies", { tag: "@ci" }, async ({ page }) => {
 });
 
 test("uses a sandboxed iframe for JavaScript execution", { tag: "@ci" }, async ({ page }) => {
-  await page.goto("/");
+  test.setTimeout(60_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "javascript",
+    files: { "main.js": "await new Promise(() => {});\n" },
+  });
+  await page.goto(`/#${hash}`);
   const sandbox = page.locator('iframe[title="Playlang sandbox"]');
-  await Promise.all([
-    page.getByTestId("run").click(),
-    expect(sandbox).toHaveAttribute("sandbox", "allow-scripts", { timeout: 15_000 }),
-  ]);
-  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", { timeout: 15_000 });
+  await page.getByTestId("run").click();
+  await expect(sandbox).toHaveAttribute("sandbox", "allow-scripts", { timeout: 15_000 });
 });
 
 test("surfaces JavaScript runtime errors", { tag: "@ci" }, async ({ page }) => {
@@ -404,4 +407,84 @@ test("Copy link writes a hash URL that round-trips", { tag: "@ci" }, async ({ pa
   await expect(page.getByTestId("output")).toContainText("copied-share", {
     timeout: 15_000,
   });
+});
+
+test("shows a banner for invalid share links", { tag: "@ci" }, async ({ page }) => {
+  await page.goto("/#p=%%%invalid");
+  await expect(page.getByTestId("invalid-share-banner")).toContainText(
+    "couldn't be loaded",
+  );
+});
+
+test("confirms before switching language with unsaved edits", { tag: "@ci" }, async ({
+  page,
+}) => {
+  await page.goto("/");
+  const editor = page.locator(".monaco-editor");
+  await editor.click();
+  await page.keyboard.press(process.platform === "darwin" ? "Meta+A" : "Control+A");
+  await page.keyboard.type('console.log("edited");');
+  await page.getByTestId("language-python").click();
+  await expect(page.getByRole("alertdialog")).toContainText("Switch to Python");
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByTestId("language-javascript")).toHaveAttribute("aria-current", "true");
+  await page.getByTestId("language-python").click();
+  await page.getByRole("button", { name: "Switch" }).click();
+  await expect(page.getByTestId("language-python")).toHaveAttribute("aria-current", "true");
+});
+
+test("shows keyboard hint before first run", { tag: "@ci" }, async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("output")).toContainText(/Press Run or (⌘|Ctrl)\+Enter/);
+});
+
+test("marks copied share links as outdated after edits", { tag: "@ci" }, async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/");
+  await page.getByTestId("copy-link").click();
+  await expect(page.getByTestId("copy-link")).toHaveText("Copied");
+  const editor = page.locator(".monaco-editor");
+  await editor.click();
+  await page.keyboard.type("\nconsole.log('stale');");
+  await expect(page.getByTestId("share-stale-badge")).toBeVisible();
+});
+
+test("shows clipboard fallback when copy is blocked", { tag: "@ci" }, async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: () => Promise.reject(new Error("denied")),
+      },
+    });
+  });
+  await page.getByTestId("copy-link").click();
+  await expect(page.getByTestId("clipboard-fallback")).toBeVisible();
+  await expect(page.getByTestId("clipboard-fallback-input")).toHaveValue(/#p=/);
+});
+
+test("renders on a mobile viewport", { tag: "@ci" }, async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await expect(page.getByTestId("language-picker")).toBeVisible();
+  await expect(page.getByTestId("action-bar-mobile")).toBeVisible();
+  await page.getByTestId("action-bar-mobile").getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 15_000,
+  });
+});
+
+test("dismisses onboarding banner", { tag: "@ci" }, async ({ page }) => {
+  await page.goto("/");
+  const banner = page.getByTestId("onboarding-banner");
+  if (await banner.isVisible()) {
+    await banner.getByRole("button", { name: "Dismiss" }).click();
+    await expect(banner).not.toBeVisible();
+  }
+  await page.reload();
+  await expect(page.getByTestId("onboarding-banner")).not.toBeVisible();
 });
