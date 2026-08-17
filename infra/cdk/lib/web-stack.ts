@@ -11,6 +11,7 @@ import {
   createSpaRoutingFunction,
   createWebSecurityHeadersPolicy,
   createWebStaticAssetsCachePolicy,
+  createWebStaticAssetsSecurityHeadersPolicy,
   TLS_POLICY,
 } from "./cdn-shared";
 import { WEB_DOMAIN, WEB_URL } from "./domain-config";
@@ -43,6 +44,11 @@ export class PlaylangWebStack extends cdk.Stack {
       this,
       "WebStaticAssetsCachePolicy",
     );
+    const staticAssetsSecurityHeadersPolicy =
+      createWebStaticAssetsSecurityHeadersPolicy(
+        this,
+        "WebStaticAssetsSecurityHeaders",
+      );
     const spaRoutingFunction = createSpaRoutingFunction(this, "SpaRouting");
 
     this.distribution = new cloudfront.Distribution(this, "WebDistribution", {
@@ -69,6 +75,7 @@ export class PlaylangWebStack extends cdk.Stack {
           allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
           cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
           cachePolicy: staticAssetsCachePolicy,
+          responseHeadersPolicy: staticAssetsSecurityHeadersPolicy,
           compress: true,
         },
       },

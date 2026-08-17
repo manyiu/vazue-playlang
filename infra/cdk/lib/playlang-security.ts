@@ -32,7 +32,7 @@ export function playlangContentSecurityPolicy(): string {
     `connect-src 'self' ${RUNTIME_CONNECT_SRC.join(" ")}`,
     "worker-src 'self' blob:",
     "child-src 'self' blob:",
-    "frame-src 'self' https://cjrtnc.leaningtech.com",
+    `frame-src 'self' ${CHEERPJ_CDN_ORIGIN}`,
     // 'self' (not 'none'): the JS/TS runner embeds same-origin /js-sandbox.html.
     "frame-ancestors 'self'",
     "base-uri 'self'",

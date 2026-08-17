@@ -21,8 +21,50 @@ export function createWebSecurityHeadersPolicy(
   scope: Construct,
   id: string,
 ): cloudfront.ResponseHeadersPolicy {
+  return createPlaylangResponseHeadersPolicy(scope, id, {
+    policyName: "PlaylangWebSecurity",
+    cacheControl: "no-cache",
+  });
+}
+
+/** Same security posture as the SPA, without overriding Cache-Control (long-cache policy applies). */
+export function createWebStaticAssetsSecurityHeadersPolicy(
+  scope: Construct,
+  id: string,
+): cloudfront.ResponseHeadersPolicy {
+  return createPlaylangResponseHeadersPolicy(scope, id, {
+    policyName: "PlaylangWebStaticAssetsSecurity",
+    cacheControl: null,
+  });
+}
+
+function createPlaylangResponseHeadersPolicy(
+  scope: Construct,
+  id: string,
+  options: { policyName: string; cacheControl: string | null },
+): cloudfront.ResponseHeadersPolicy {
+  const customHeaders: cloudfront.ResponseCustomHeader[] = [
+    {
+      header: "Cross-Origin-Opener-Policy",
+      value: PLAYLANG_COOP,
+      override: true,
+    },
+    {
+      header: "Cross-Origin-Embedder-Policy",
+      value: PLAYLANG_COEP,
+      override: true,
+    },
+  ];
+  if (options.cacheControl !== null) {
+    customHeaders.unshift({
+      header: "Cache-Control",
+      value: options.cacheControl,
+      override: true,
+    });
+  }
+
   return new cloudfront.ResponseHeadersPolicy(scope, id, {
-    responseHeadersPolicyName: "PlaylangWebSecurity",
+    responseHeadersPolicyName: options.policyName,
     securityHeadersBehavior: {
       strictTransportSecurity: {
         override: true,
@@ -42,19 +84,7 @@ export function createWebSecurityHeadersPolicy(
       },
     },
     customHeadersBehavior: {
-      customHeaders: [
-        { header: "Cache-Control", value: "no-cache", override: true },
-        {
-          header: "Cross-Origin-Opener-Policy",
-          value: PLAYLANG_COOP,
-          override: true,
-        },
-        {
-          header: "Cross-Origin-Embedder-Policy",
-          value: PLAYLANG_COEP,
-          override: true,
-        },
-      ],
+      customHeaders,
     },
   });
 }

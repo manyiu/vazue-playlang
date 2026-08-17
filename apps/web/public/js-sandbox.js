@@ -1,6 +1,8 @@
 (() => {
-  const post = (data) => {
-    parent.postMessage({ source: "playlang-sandbox", ...data }, "*");
+  let running = false;
+
+  const postReady = () => {
+    parent.postMessage({ source: "playlang-sandbox", type: "ready" }, "*");
   };
 
   const stringify = (value) => {
@@ -16,6 +18,14 @@
   window.addEventListener("message", (event) => {
     if (event.source !== parent) return;
     if (!event.data || event.data.type !== "run") return;
+    if (running) return;
+
+    const port = event.ports[0];
+    if (!port) return;
+
+    running = true;
+    port.start();
+
     const code = String(event.data.code ?? "");
     const stdout = [];
     const stderr = [];
@@ -27,32 +37,32 @@
     console.log = capture(stdout);
     console.info = capture(stdout);
     console.debug = capture(stdout);
-    console.warn = capture(stdout);
+    console.warn = capture(stderr);
     console.error = capture(stderr);
+
+    const sendResult = (ok) => {
+      port.postMessage({
+        type: "result",
+        ok,
+        stdout: stdout.join("\n"),
+        stderr: stderr.join("\n"),
+      });
+      running = false;
+    };
 
     Promise.resolve()
       .then(() => {
         const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-        return new AsyncFunction(code)();
+        return new AsyncFunction('"use strict";\n' + code)();
       })
       .then(() => {
-        post({
-          type: "result",
-          ok: true,
-          stdout: stdout.join("\n"),
-          stderr: stderr.join("\n"),
-        });
+        sendResult(true);
       })
       .catch((err) => {
         stderr.push(stringify(err));
-        post({
-          type: "result",
-          ok: false,
-          stdout: stdout.join("\n"),
-          stderr: stderr.join("\n"),
-        });
+        sendResult(false);
       });
   });
 
-  post({ type: "ready" });
+  postReady();
 })();

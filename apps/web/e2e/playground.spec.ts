@@ -1,17 +1,24 @@
 import { expect, test } from "@playwright/test";
 import { encodeShare } from "@playlang/runtime-core";
-import { playlangContentSecurityPolicy } from "../../../infra/cdk/lib/playlang-security.ts";
+import {
+  PLAYLANG_COEP,
+  PLAYLANG_COOP,
+  playlangContentSecurityPolicy,
+} from "../../../infra/cdk/lib/playlang-security.ts";
 
 test("serves production CSP so sandboxes cannot rely on inline scripts", { tag: "@ci" }, async ({
   request,
 }) => {
   const response = await request.get("/");
   expect(response.ok()).toBeTruthy();
-  const csp = response.headers()["content-security-policy"];
+  const headers = response.headers();
+  const csp = headers["content-security-policy"];
   expect(csp).toBe(playlangContentSecurityPolicy());
   expect(csp).not.toMatch(/script-src[^;]*'unsafe-inline'/);
   expect(csp).toContain("frame-ancestors 'self'");
   expect(csp).toMatch(/script-src[^;]*'unsafe-eval'/);
+  expect(headers["cross-origin-embedder-policy"]).toBe(PLAYLANG_COEP);
+  expect(headers["cross-origin-opener-policy"]).toBe(PLAYLANG_COOP);
 
   const sandboxHtml = await request.get("/js-sandbox.html");
   expect(sandboxHtml.ok()).toBeTruthy();
@@ -84,6 +91,66 @@ test("sandbox cannot read parent cookies", { tag: "@ci" }, async ({ page }) => {
   const output = page.getByTestId("output");
   await expect(output).toContainText(/COOKIE(=|_BLOCKED)/, { timeout: 15_000 });
   await expect(output).not.toContainText("should-not-leak");
+});
+
+test("uses a sandboxed iframe for JavaScript execution", { tag: "@ci" }, async ({ page }) => {
+  await page.goto("/");
+  const sandbox = page.locator('iframe[title="Playlang sandbox"]');
+  await Promise.all([
+    page.getByTestId("run").click(),
+    expect(sandbox).toHaveAttribute("sandbox", "allow-scripts", { timeout: 15_000 }),
+  ]);
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", { timeout: 15_000 });
+});
+
+test("surfaces JavaScript runtime errors", { tag: "@ci" }, async ({ page }) => {
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "javascript",
+    files: { "main.js": 'throw new Error("boom");\n' },
+  });
+  await page.goto(`/#${hash}`);
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("boom", { timeout: 15_000 });
+});
+
+test("runs async JavaScript", { tag: "@ci" }, async ({ page }) => {
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "javascript",
+    files: {
+      "main.js": 'await Promise.resolve();\nconsole.log("async-ok");\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText("async-ok", { timeout: 15_000 });
+});
+
+test("times out hung JavaScript", { tag: "@ci" }, async ({ page }) => {
+  test.setTimeout(60_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "javascript",
+    files: { "main.js": "await new Promise(() => {});\n" },
+  });
+  await page.goto(`/#${hash}`);
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText(/Timed out after 30000ms/i, {
+    timeout: 40_000,
+  });
+});
+
+test("surfaces TypeScript compile errors without executing", { tag: "@ci" }, async ({ page }) => {
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "typescript",
+    files: { "main.ts": "const x = ;\n" },
+  });
+  await page.goto(`/#${hash}`);
+  await page.getByTestId("run").click();
+  const output = page.getByTestId("output");
+  await expect(output).toContainText(/Expression expected/i, { timeout: 15_000 });
 });
 
 test("runs Lua from a share link", { tag: "@ci" }, async ({ page }) => {
