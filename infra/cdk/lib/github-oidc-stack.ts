@@ -10,6 +10,8 @@ export interface PlaylangGithubOidcStackProps extends cdk.StackProps {
   distribution: cloudfront.IDistribution;
   githubOwner: string;
   githubOwnerId: string;
+  githubRepo: string;
+  githubRepoId: string;
 }
 
 /**
@@ -19,9 +21,9 @@ export interface PlaylangGithubOidcStackProps extends cdk.StackProps {
  * `GithubActionsOidcStack` in aws-common-cdk). Does not create a second
  * provider — AWS allows only one per URL.
  *
- * Trust is account-wide so every repository under this GitHub user can assume
- * this role (legacy `repo:login/*:*` and immutable `repo:login@id/*:*`).
- * Permissions stay limited to the Playlang web bucket and CDN.
+ * Trust is this repository only (legacy `repo:login/repo:*` and immutable
+ * `repo:login@id/repo@id:*`). Permissions stay limited to the Playlang web
+ * bucket and CDN.
  */
 export class PlaylangGithubOidcStack extends cdk.Stack {
   public readonly deployRole: iam.Role;
@@ -47,6 +49,8 @@ export class PlaylangGithubOidcStack extends cdk.Stack {
           "token.actions.githubusercontent.com:sub": githubOidcSubs(
             props.githubOwner,
             props.githubOwnerId,
+            props.githubRepo,
+            props.githubRepoId,
           ),
         },
       }),

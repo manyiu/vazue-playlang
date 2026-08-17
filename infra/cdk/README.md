@@ -54,8 +54,10 @@ pnpm deploy:web
 | `CDK_DEFAULT_REGION` | `us-east-1` | CloudFront + ACM region |
 | `DOMAIN` | `playlang.vazue.com` | CloudFront alias + cert |
 | `HOSTED_ZONE_NAME` | `vazue.com` | Route 53 lookup |
-| `GITHUB_OWNER` | `manyiu` | OIDC trust: all repos under this GitHub account |
+| `GITHUB_OWNER` | `manyiu` | OIDC trust: GitHub account/org that owns this repo |
 | `GITHUB_OWNER_ID` | `11912398` | Numeric user id for immutable OIDC `sub` claims |
+| `GITHUB_REPO` | `vazue-playlang` | OIDC trust: this repository only |
+| `GITHUB_REPO_ID` | `1335729930` | Numeric repo id for immutable OIDC `sub` claims |
 
 Copy `.env.example` to `.env.local` for local overrides. Never commit real account IDs.
 
@@ -87,16 +89,16 @@ Web publishes (`.github/workflows/deploy-web.yml`) run on push to `main` via
 | Piece | Value |
 | --- | --- |
 | IAM role | `PlaylangWebDeploy` (`PlaylangGithubOidcStack`) |
-| Trust | `repo:manyiu/*:*` and `repo:manyiu@11912398/*:*` (legacy + immutable OIDC `sub`) |
+| Trust | `repo:manyiu/vazue-playlang:*` and `repo:manyiu@11912398/vazue-playlang@1335729930:*` (legacy + immutable OIDC `sub`) |
 | Permissions | Web bucket read/write, CloudFront invalidation, `DescribeStacks` on `PlaylangWebStack` |
 | GitHub | Environment `production` (restricted to `main`) + secret `AWS_ROLE_ARN` |
 
-Forks outside `manyiu` cannot assume the role. Infra changes (DNS, CloudFront, cert) stay on
+Forks and other repositories under `manyiu` cannot assume the role. Infra changes (DNS, CloudFront, cert) stay on
 `pnpm deploy:dns` / `pnpm deploy:web` from a local AWS SSO session.
 
 ### First-time OIDC setup
 
-1. Public repo `manyiu/vazue-playlang` (or set `GITHUB_OWNER` before synth)
+1. Public repo `manyiu/vazue-playlang` (or set `GITHUB_OWNER` / `GITHUB_REPO` before synth)
 2. Account already has an OIDC provider for `token.actions.githubusercontent.com` (Vazue: `GithubActionsOidcStack` in aws-common-cdk)
 3. From repo root, with AWS SSO:
 

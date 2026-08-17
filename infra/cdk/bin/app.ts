@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
 import { PlaylangDnsCertStack } from "../lib/dns-cert-stack";
-import { GITHUB_OWNER, GITHUB_OWNER_ID } from "../lib/github-config";
+import {
+  GITHUB_OWNER,
+  GITHUB_OWNER_ID,
+  GITHUB_REPO,
+  GITHUB_REPO_ID,
+} from "../lib/github-config";
 import { PlaylangGithubOidcStack } from "../lib/github-oidc-stack";
 import { PlaylangWebStack } from "../lib/web-stack";
 
@@ -35,6 +40,8 @@ const oidcStack = new PlaylangGithubOidcStack(app, "PlaylangGithubOidcStack", {
   distribution: webStack.distribution,
   githubOwner: GITHUB_OWNER,
   githubOwnerId: GITHUB_OWNER_ID,
+  githubRepo: GITHUB_REPO,
+  githubRepoId: GITHUB_REPO_ID,
   description: "GitHub Actions OIDC role for Playlang web deploys",
 });
 oidcStack.addDependency(webStack);
