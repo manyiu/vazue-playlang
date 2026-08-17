@@ -5,42 +5,61 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import wasmSharp from "@wasmsharp/vite-plugin";
 import { popcorn } from "@swmansion/popcorn/vite";
+import {
+  PLAYLANG_COEP,
+  PLAYLANG_COOP,
+  playlangContentSecurityPolicy,
+} from "../../infra/cdk/lib/playlang-security.ts";
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(webRoot, "../..");
 const elixirBundle = path.join(rootDir, "apps/web/public/bundle.avm");
 
 /**
- * Popcorn's Vite plugin hardcodes COEP: require-corp. Use credentialless so
- * CheerpJ CDN iframes can load when marked credentialless by the Java adapter.
+ * Match CloudFront COEP/COOP in local Vite. Apply the full production CSP on
+ * preview only — Vite's dev client is incompatible with script-src without
+ * 'unsafe-inline', and e2e uses `vite preview` so CSP regressions still fail CI.
  */
-function popcornCompatibleCoep(): Plugin {
-  const apply = (res: { setHeader: (name: string, value: string) => void }) => {
-    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-    res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+function playlangSecurityHeaders(): Plugin {
+  const applyIsolation = (res: {
+    setHeader: (name: string, value: string) => void;
+  }) => {
+    res.setHeader("Cross-Origin-Opener-Policy", PLAYLANG_COOP);
+    res.setHeader("Cross-Origin-Embedder-Policy", PLAYLANG_COEP);
+    res.setHeader("Referrer-Policy", "no-referrer");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+  };
+  const applyCsp = (res: { setHeader: (name: string, value: string) => void }) => {
+    res.setHeader("Content-Security-Policy", playlangContentSecurityPolicy());
   };
   return {
-    name: "playlang-popcorn-compatible-coep",
+    name: "playlang-security-headers",
     configureServer(server) {
       server.middlewares.use((_req, res, next) => {
-        apply(res);
+        applyIsolation(res);
         next();
       });
     },
     configurePreviewServer(server) {
       server.middlewares.use((_req, res, next) => {
-        apply(res);
+        applyIsolation(res);
+        applyCsp(res);
         next();
       });
     },
   };
 }
 
-const securityHeaders = {
+const isolationHeaders = {
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
-  "Cross-Origin-Opener-Policy": "same-origin",
-  "Cross-Origin-Embedder-Policy": "credentialless",
+  "Cross-Origin-Opener-Policy": PLAYLANG_COOP,
+  "Cross-Origin-Embedder-Policy": PLAYLANG_COEP,
+};
+
+const previewSecurityHeaders = {
+  ...isolationHeaders,
+  "Content-Security-Policy": playlangContentSecurityPolicy(),
 };
 
 export default defineConfig({
@@ -49,14 +68,17 @@ export default defineConfig({
     tailwindcss(),
     ...wasmSharp(),
     popcorn({ bundlePaths: [elixirBundle] }),
-    popcornCompatibleCoep(),
+    playlangSecurityHeaders(),
   ],
   server: {
     port: 5173,
-    headers: securityHeaders,
+    // Listen on all interfaces so both localhost and 127.0.0.1 work.
+    host: true,
+    headers: isolationHeaders,
   },
   preview: {
-    headers: securityHeaders,
+    host: true,
+    headers: previewSecurityHeaders,
   },
   worker: {
     format: "es",

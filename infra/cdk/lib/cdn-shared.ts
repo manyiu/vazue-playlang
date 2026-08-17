@@ -1,45 +1,21 @@
 import * as cdk from "aws-cdk-lib";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import type { Construct } from "constructs";
+import {
+  PLAYLANG_COEP,
+  PLAYLANG_COOP,
+  playlangContentSecurityPolicy,
+} from "./playlang-security";
 
-/** Pinned runtime CDNs referenced by Playlang adapters (see packages/runtimes versions.ts). */
-export const RUNTIME_CONNECT_SRC = [
-  "https://cdn.jsdelivr.net",
-  "https://webr.r-wasm.org",
-  // CheerpJ Java runtime (Community License CDN; do not self-host).
-  "https://cjrtnc.leaningtech.com",
-  // Pyodide micropip (optional; gated in product copy).
-  "https://pypi.org",
-  "https://files.pythonhosted.org",
-];
-
-/** CheerpJ loader origin — required in script-src (dynamic script tag). */
-export const CHEERPJ_CDN_ORIGIN = "https://cjrtnc.leaningtech.com";
-
-/** CSP string applied by CloudFront (testable without constructing a policy). */
-export function playlangContentSecurityPolicy(): string {
-  return [
-    "default-src 'self'",
-    // jsDelivr: PHP / Ruby / browsercc (and other) ES modules loaded at runtime.
-    `script-src 'self' blob: 'wasm-unsafe-eval' ${CHEERPJ_CDN_ORIGIN} https://cdn.jsdelivr.net`,
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
-    "font-src 'self' data:",
-    `connect-src 'self' ${RUNTIME_CONNECT_SRC.join(" ")}`,
-    "worker-src 'self' blob:",
-    "child-src 'self' blob:",
-    "frame-src 'self' https://cjrtnc.leaningtech.com",
-    "frame-ancestors 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-  ].join("; ");
-}
+export {
+  CHEERPJ_CDN_ORIGIN,
+  PLAYLANG_COEP,
+  PLAYLANG_COOP,
+  RUNTIME_CONNECT_SRC,
+  playlangContentSecurityPolicy,
+} from "./playlang-security";
 
 export const TLS_POLICY = cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021;
-
-/** SharedArrayBuffer for Popcorn; credentialless keeps CheerpJ iframes workable. */
-export const PLAYLANG_COEP = "credentialless";
-export const PLAYLANG_COOP = "same-origin";
 
 export function createWebSecurityHeadersPolicy(
   scope: Construct,

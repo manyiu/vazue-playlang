@@ -1,5 +1,28 @@
 import { expect, test } from "@playwright/test";
 import { encodeShare } from "@playlang/runtime-core";
+import { playlangContentSecurityPolicy } from "../../../infra/cdk/lib/playlang-security.ts";
+
+test("serves production CSP so sandboxes cannot rely on inline scripts", { tag: "@ci" }, async ({
+  request,
+}) => {
+  const response = await request.get("/");
+  expect(response.ok()).toBeTruthy();
+  const csp = response.headers()["content-security-policy"];
+  expect(csp).toBe(playlangContentSecurityPolicy());
+  expect(csp).not.toMatch(/script-src[^;]*'unsafe-inline'/);
+  expect(csp).toContain("frame-ancestors 'self'");
+  expect(csp).toMatch(/script-src[^;]*'unsafe-eval'/);
+
+  const sandboxHtml = await request.get("/js-sandbox.html");
+  expect(sandboxHtml.ok()).toBeTruthy();
+  const html = await sandboxHtml.text();
+  expect(html).toContain('src="./js-sandbox.js"');
+  expect(html).not.toMatch(/<script(?![^>]*\bsrc=)[^>]*>/);
+
+  const sandboxJs = await request.get("/js-sandbox.js");
+  expect(sandboxJs.ok()).toBeTruthy();
+  expect(await sandboxJs.text()).toContain('source: "playlang-sandbox"');
+});
 
 test("runs the default JavaScript example", { tag: "@ci" }, async ({ page }) => {
   await page.goto("/");
@@ -8,6 +31,7 @@ test("runs the default JavaScript example", { tag: "@ci" }, async ({ page }) => 
   await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
     timeout: 15_000,
   });
+  await expect(page.getByTestId("output")).not.toContainText("Timed out");
 });
 
 test("loads a shared snapshot from the URL hash", { tag: "@ci" }, async ({ page }) => {
@@ -35,6 +59,7 @@ test("runs TypeScript from a share link", { tag: "@ci" }, async ({ page }) => {
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   await expect(page.getByTestId("output")).toContainText("42", { timeout: 20_000 });
+  await expect(page.getByTestId("output")).not.toContainText("Timed out");
 });
 
 test("sandbox cannot read parent cookies", { tag: "@ci" }, async ({ page }) => {
@@ -61,7 +86,7 @@ test("sandbox cannot read parent cookies", { tag: "@ci" }, async ({ page }) => {
   await expect(output).not.toContainText("should-not-leak");
 });
 
-test("runs Lua from a share link", async ({ page }) => {
+test("runs Lua from a share link", { tag: "@ci" }, async ({ page }) => {
   const { hash } = encodeShare({
     v: 1,
     languageId: "lua",
@@ -73,9 +98,10 @@ test("runs Lua from a share link", async ({ page }) => {
   await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
     timeout: 30_000,
   });
+  await expect(page.getByTestId("output")).not.toContainText("Timed out");
 });
 
-test("runs SQL from a share link", async ({ page }) => {
+test("runs SQL from a share link", { tag: "@ci" }, async ({ page }) => {
   const { hash } = encodeShare({
     v: 1,
     languageId: "sql",
@@ -87,6 +113,7 @@ test("runs SQL from a share link", async ({ page }) => {
   await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
     timeout: 30_000,
   });
+  await expect(page.getByTestId("output")).not.toContainText("Timed out");
 });
 
 test("runs Python from a share link", async ({ page }) => {

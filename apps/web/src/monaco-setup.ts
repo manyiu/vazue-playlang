@@ -13,8 +13,10 @@ export function setupMonaco(): void {
   window.MonacoEnvironment = {
     getWorker(_workerId: string, label: string) {
       if (label === "json") return new jsonWorker();
-      // Default JS path must not pay for the ~5.7 MB TypeScript language service.
-      if (label === "typescript") return new tsWorker();
+      // Both JS and TS use Monaco's TypeScript language service. Returning the
+      // plain editor worker for "javascript" makes $loadForeignModule call
+      // require.toUrl (undefined in the Vite ESM build) and throw.
+      if (label === "typescript" || label === "javascript") return new tsWorker();
       return new editorWorker();
     },
   };
