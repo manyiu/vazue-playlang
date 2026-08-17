@@ -113,6 +113,10 @@ header policies (`scripts/sync-playlang-csp.sh`), then invalidates the CDN. It
 does not run full `cdk deploy`, so the role does not need CloudFormation stack
 update rights — only `DescribeStackResources` and CloudFront header-policy edits.
 
+After publish, `scripts/smoke-playlang-csp.sh` compares live headers at
+`https://playlang.vazue.com` against `playlang-security.ts` (full CSP, COEP,
+COOP, and js-sandbox assets) and fails the deploy on drift.
+
 ## Rollback
 
 Web bucket has **versioning** enabled. Restore a previous object version in S3, then run `pnpm deploy:web` again. Default behavior uses `Cache-Control: no-cache` on HTML so browsers revalidate `index.html`.

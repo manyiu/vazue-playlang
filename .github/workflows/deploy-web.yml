@@ -60,12 +60,5 @@ jobs:
           bash scripts/sync-playlang-csp.sh
           aws cloudfront create-invalidation --distribution-id "${DIST}" --paths "/*"
 
-      - name: Smoke test
-        run: |
-          set -euo pipefail
-          HEADERS="$(curl -sfI https://playlang.vazue.com/)"
-          echo "${HEADERS}" | head -20
-          echo "${HEADERS}" | grep -qi "content-security-policy:.*frame-ancestors 'self'"
-          echo "${HEADERS}" | grep -qi "content-security-policy:.*'unsafe-eval'"
-          curl -sf https://playlang.vazue.com/ | grep -q "<div id=\"root\""
-          echo "Playlang web OK"
+      - name: Smoke test production CSP and site
+        run: bash scripts/smoke-playlang-csp.sh
