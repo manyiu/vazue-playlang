@@ -38,7 +38,7 @@ export class PlaylangGithubOidcStack extends cdk.Stack {
     this.deployRole = new iam.Role(this, "WebDeployRole", {
       roleName: "PlaylangWebDeploy",
       description:
-        "GitHub Actions OIDC: S3 sync + CloudFront invalidation for Playlang",
+        "GitHub Actions OIDC: S3 sync, CloudFront CSP sync + invalidation for Playlang",
       assumedBy: new iam.OpenIdConnectPrincipal(provider, {
         StringEquals: {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
@@ -69,19 +69,35 @@ export class PlaylangGithubOidcStack extends cdk.Stack {
       }),
     );
 
+    const webStackArn = cdk.Arn.format(
+      {
+        service: "cloudformation",
+        resource: "stack",
+        resourceName: "PlaylangWebStack/*",
+      },
+      this,
+    );
+
     this.deployRole.addToPolicy(
       new iam.PolicyStatement({
         sid: "ReadWebStackOutputs",
-        actions: ["cloudformation:DescribeStacks"],
+        actions: [
+          "cloudformation:DescribeStacks",
+          "cloudformation:DescribeStackResources",
+        ],
+        resources: [webStackArn],
+      }),
+    );
+
+    this.deployRole.addToPolicy(
+      new iam.PolicyStatement({
+        sid: "SyncPlaylangCspHeaders",
+        actions: [
+          "cloudfront:GetResponseHeadersPolicy",
+          "cloudfront:UpdateResponseHeadersPolicy",
+        ],
         resources: [
-          cdk.Arn.format(
-            {
-              service: "cloudformation",
-              resource: "stack",
-              resourceName: "PlaylangWebStack/*",
-            },
-            this,
-          ),
+          `arn:aws:cloudfront::${this.account}:response-headers-policy/*`,
         ],
       }),
     );

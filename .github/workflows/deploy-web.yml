@@ -45,7 +45,7 @@ jobs:
       - name: Build web
         run: pnpm build
 
-      - name: Publish dist to S3 and invalidate CloudFront
+      - name: Publish dist to S3, sync CSP, and invalidate CloudFront
         run: |
           set -euo pipefail
           BUCKET="$(aws cloudformation describe-stacks \
@@ -57,10 +57,15 @@ jobs:
             --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" \
             --output text)"
           aws s3 sync apps/web/dist "s3://${BUCKET}" --delete
+          bash scripts/sync-playlang-csp.sh
           aws cloudfront create-invalidation --distribution-id "${DIST}" --paths "/*"
 
       - name: Smoke test
         run: |
-          curl -sfI https://playlang.vazue.com/ | head -20
+          set -euo pipefail
+          HEADERS="$(curl -sfI https://playlang.vazue.com/)"
+          echo "${HEADERS}" | head -20
+          echo "${HEADERS}" | grep -qi "content-security-policy:.*frame-ancestors 'self'"
+          echo "${HEADERS}" | grep -qi "content-security-policy:.*'unsafe-eval'"
           curl -sf https://playlang.vazue.com/ | grep -q "<div id=\"root\""
           echo "Playlang web OK"

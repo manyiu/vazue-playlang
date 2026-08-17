@@ -108,8 +108,10 @@ pnpm deploy:oidc
 
 4. Copy output `WebDeployRoleArn` into GitHub Environment secret `AWS_ROLE_ARN` on `production`.
 
-CI deploys with `aws s3 sync` + invalidation, not `cdk deploy`, so the role does
-not need CloudFormation update rights.
+CI deploys with `aws s3 sync`, syncs the canonical CSP onto CloudFront response
+header policies (`scripts/sync-playlang-csp.sh`), then invalidates the CDN. It
+does not run full `cdk deploy`, so the role does not need CloudFormation stack
+update rights — only `DescribeStackResources` and CloudFront header-policy edits.
 
 ## Rollback
 
