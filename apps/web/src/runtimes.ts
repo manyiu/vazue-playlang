@@ -13,6 +13,7 @@ const runtimeIds = [
   "csharp",
   "java",
   "cpp",
+  "elixir",
 ] as const;
 
 export type RuntimeId = (typeof runtimeIds)[number];
@@ -76,6 +77,10 @@ export function loadRuntime(id: RuntimeId): Promise<RuntimeAdapter> {
       case "cpp": {
         const mod = await import("@playlang/runtime-cpp");
         return mod.cppRuntime;
+      }
+      case "elixir": {
+        const mod = await import("@playlang/runtime-elixir");
+        return mod.elixirRuntime;
       }
       default: {
         const _exhaustive: never = id;

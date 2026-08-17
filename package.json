@@ -23,7 +23,8 @@
     "typecheck": "pnpm -r typecheck",
     "deploy:dns": "pnpm --filter @playlang/infra-cdk deploy:dns",
     "deploy:web": "pnpm build && pnpm --filter @playlang/infra-cdk deploy:web",
-    "deploy:oidc": "pnpm --filter @playlang/infra-cdk deploy:oidc"
+    "deploy:oidc": "pnpm --filter @playlang/infra-cdk deploy:oidc",
+    "cook:elixir": "bash scripts/cook-elixir.sh"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -183,13 +183,12 @@ int main() {
     name: "Elixir",
     monacoLanguage: "elixir",
     engine: "Popcorn",
-    version: "AtomVM",
-    status: "coming",
-    reason:
-      "Needs a cooked .avm eval bundle (Elixir/Mix) plus COOP/COEP for AtomVM threads.",
+    version: "0.3.3",
+    status: "available",
     guestNetwork: true,
     examplePath: "main.exs",
     example: `IO.puts("Hello, Playlang")
+IO.puts(2 + 2)
 `,
   },
 ];

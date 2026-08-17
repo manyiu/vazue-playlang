@@ -25,5 +25,7 @@ and keep this NOTICE updated:
 - OpenJDK tools.jar (javac used with CheerpJ; served from this origin as /tools.jar) — GPL-2.0-with-classpath-exception
 - browsercc 0.1.1 (Clang/LLD + WASI sysroot for C/C++; loaded from jsDelivr) — MIT
 - @bjorn3/browser_wasi_shim 0.4.2 (WASI host for browsercc output; loaded from jsDelivr) — MIT OR Apache-2.0
+- Popcorn / @swmansion/popcorn 0.3.3 (Elixir-on-AtomVM in the browser; Apache-2.0) — https://github.com/software-mansion/popcorn
+- AtomVM (Erlang VM subset used by Popcorn; see upstream LICENSE) — https://github.com/atomvm/AtomVM
 
 Forks that vendor WASM blobs must retain the corresponding license texts.

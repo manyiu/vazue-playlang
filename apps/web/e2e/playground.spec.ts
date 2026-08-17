@@ -276,6 +276,23 @@ test("runs C from a share link", async ({ page }) => {
   await expect(output).toContainText("4");
 });
 
+test("runs Elixir from a share link", async ({ page }) => {
+  test.setTimeout(180_000);
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "elixir",
+    files: {
+      "main.exs": 'IO.puts("Hello, Playlang")\nIO.puts(2 + 2)\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  const output = page.getByTestId("output");
+  await expect(output).toContainText("Hello, Playlang", { timeout: 150_000 });
+  await expect(output).toContainText("4");
+});
+
 test("Copy link writes a hash URL that round-trips", { tag: "@ci" }, async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   const { hash } = encodeShare({

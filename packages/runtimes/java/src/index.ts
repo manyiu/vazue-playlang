@@ -1,6 +1,7 @@
 import type { RunRequest, RunResult, RuntimeAdapter } from "@playlang/runtime-core";
 import { capOutput, entrySource, withTimeout } from "@playlang/runtime-core";
 import { cheerpj } from "./cheerpj.ts";
+import { enableCredentiallessIframes } from "./credentiallessIframes.ts";
 import { deriveMainClass } from "./mainClass.ts";
 import {
   CHEERPJ_LOADER_URL,
@@ -134,6 +135,7 @@ async function readVfsText(path: string): Promise<string> {
 async function ensureCheerpJ(): Promise<void> {
   if (loadPromise) return loadPromise;
   loadPromise = (async () => {
+    enableCredentiallessIframes();
     await loadScript(CHEERPJ_LOADER_URL);
     const api = cheerpj();
     if (typeof api.cheerpjInit !== "function") {

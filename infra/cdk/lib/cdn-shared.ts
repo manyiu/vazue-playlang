@@ -28,7 +28,7 @@ export function playlangContentSecurityPolicy(): string {
     `connect-src 'self' ${RUNTIME_CONNECT_SRC.join(" ")}`,
     "worker-src 'self' blob:",
     "child-src 'self' blob:",
-    "frame-src 'self'",
+    "frame-src 'self' https://cjrtnc.leaningtech.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -36,6 +36,10 @@ export function playlangContentSecurityPolicy(): string {
 }
 
 export const TLS_POLICY = cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021;
+
+/** SharedArrayBuffer for Popcorn; credentialless keeps CheerpJ iframes workable. */
+export const PLAYLANG_COEP = "credentialless";
+export const PLAYLANG_COOP = "same-origin";
 
 export function createWebSecurityHeadersPolicy(
   scope: Construct,
@@ -64,6 +68,16 @@ export function createWebSecurityHeadersPolicy(
     customHeadersBehavior: {
       customHeaders: [
         { header: "Cache-Control", value: "no-cache", override: true },
+        {
+          header: "Cross-Origin-Opener-Policy",
+          value: PLAYLANG_COOP,
+          override: true,
+        },
+        {
+          header: "Cross-Origin-Embedder-Policy",
+          value: PLAYLANG_COEP,
+          override: true,
+        },
       ],
     },
   });

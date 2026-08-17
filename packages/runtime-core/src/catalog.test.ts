@@ -16,7 +16,7 @@ describe("language catalog", () => {
     expect(ids).toContain("csharp");
     expect(ids).toContain("java");
     expect(ids).toContain("cpp");
-    expect(ids).not.toContain("elixir");
+    expect(ids).toContain("elixir");
   });
 
   it("describes Java as CheerpJ with guest network", () => {
@@ -34,7 +34,7 @@ describe("language catalog", () => {
     expect(java?.example).toMatch(/System\.out\.println\("Hello, Playlang"\)/);
   });
 
-  it("describes C/C++ as browsercc and keeps Elixir as coming", () => {
+  it("describes C/C++ as browsercc and Elixir as Popcorn", () => {
     expect(languageById("cpp")).toMatchObject({
       status: "available",
       engine: "browsercc",
@@ -43,9 +43,12 @@ describe("language catalog", () => {
       examplePath: "main.cpp",
     });
     expect(languageById("elixir")).toMatchObject({
-      status: "coming",
+      status: "available",
       engine: "Popcorn",
+      version: "0.3.3",
       monacoLanguage: "elixir",
+      guestNetwork: true,
+      examplePath: "main.exs",
     });
   });
 

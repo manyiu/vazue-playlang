@@ -61,9 +61,9 @@ export function App() {
     try {
       const runtime = await loadRuntime(language.id);
       await runtime.load();
-      // C# / Java / C++ cold-start large WASM toolchains; allow more than the default 30s budget.
+      // C# / Java / C++ / Elixir cold-start large WASM toolchains; allow more than the default 30s budget.
       const timeoutMs =
-        language.id === "csharp" || language.id === "java"
+        language.id === "csharp" || language.id === "java" || language.id === "elixir"
           ? 120_000
           : language.id === "cpp"
             ? 180_000

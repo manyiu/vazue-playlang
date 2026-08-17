@@ -1,0 +1,12 @@
+# Mix / Popcorn cook outputs (keep artifacts/bundle.avm when committed)
+_build/
+deps/
+.elixir_ls/
+*.ez
+erl_crash.dump
+
+# Temporary cook leftovers besides the published bundle
+# Commit apps/web/public/bundle.avm (served to the SPA); keep local cook output out of git.
+artifacts/*
+!artifacts/.gitkeep
+!artifacts/README.md
