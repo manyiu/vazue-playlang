@@ -3,6 +3,7 @@ import { encodeShare, languageById } from "@playlang/runtime-core";
 import {
   PLAYLANG_COEP,
   PLAYLANG_COOP,
+  PLAYLANG_CORP,
   playlangContentSecurityPolicy,
 } from "../../../infra/cdk/lib/playlang-security.ts";
 
@@ -31,9 +32,11 @@ test("serves production CSP so sandboxes cannot rely on inline scripts", { tag: 
   expect(csp).toMatch(/script-src[^;]*'unsafe-eval'/);
   expect(headers["cross-origin-embedder-policy"]).toBe(PLAYLANG_COEP);
   expect(headers["cross-origin-opener-policy"]).toBe(PLAYLANG_COOP);
+  expect(headers["cross-origin-resource-policy"]).toBe(PLAYLANG_CORP);
 
   const sandboxHtml = await request.get("/js-sandbox.html");
   expect(sandboxHtml.ok()).toBeTruthy();
+  expect(sandboxHtml.headers()["cross-origin-resource-policy"]).toBe(PLAYLANG_CORP);
   const html = await sandboxHtml.text();
   expect(html).toContain('src="./js-sandbox.js"');
   expect(html).not.toMatch(/<script(?![^>]*\bsrc=)[^>]*>/);

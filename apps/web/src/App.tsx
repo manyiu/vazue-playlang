@@ -162,6 +162,7 @@ export function App() {
     runStartedAt.current = Date.now();
     try {
       const runtime = await loadRuntime(language.id);
+      await runtime.load();
       setRunPhase("running");
       const timeoutMs =
         language.id === "csharp" || language.id === "java" || language.id === "elixir"

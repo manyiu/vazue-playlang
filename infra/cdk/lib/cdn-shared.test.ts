@@ -11,6 +11,7 @@ import {
   JSDELIVR_ORIGIN,
   PLAYLANG_COEP,
   PLAYLANG_COOP,
+  PLAYLANG_CORP,
   RUNTIME_CONNECT_SRC,
   RUNTIME_SCRIPT_ORIGINS,
   WASMSHARP_COMLINK_CDN,
@@ -67,6 +68,7 @@ describe("Playlang CSP", () => {
   it("uses COEP credentialless so Popcorn and CheerpJ can coexist", () => {
     expect(PLAYLANG_COOP).toBe("same-origin");
     expect(PLAYLANG_COEP).toBe("credentialless");
+    expect(PLAYLANG_CORP).toBe("cross-origin");
   });
 
   it("allowlists every runtime CDN origin referenced in adapter versions", () => {

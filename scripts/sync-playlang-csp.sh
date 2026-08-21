@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Push the canonical CSP from playlang-security.ts onto both CloudFront
+# Push canonical CSP + CORP from playlang-security.ts onto both CloudFront
 # response header policies attached to PlaylangWebStack.
 set -euo pipefail
 
@@ -9,6 +9,10 @@ cd "$ROOT"
 CSP="$(
   pnpm --filter @playlang/infra-cdk exec tsx -e \
     "import { playlangContentSecurityPolicy } from './lib/playlang-security.ts'; process.stdout.write(playlangContentSecurityPolicy());"
+)"
+CORP="$(
+  pnpm --filter @playlang/infra-cdk exec tsx -e \
+    "import { PLAYLANG_CORP } from './lib/playlang-security.ts'; process.stdout.write(PLAYLANG_CORP);"
 )"
 
 mapfile -t POLICY_IDS < <(
@@ -23,10 +27,10 @@ if ((${#POLICY_IDS[@]} == 0)); then
   exit 1
 fi
 
-echo "Syncing CSP onto ${#POLICY_IDS[@]} response header policies"
+echo "Syncing CSP + CORP onto ${#POLICY_IDS[@]} response header policies"
 
 for policy_id in "${POLICY_IDS[@]}"; do
-  echo "Updating CSP on response headers policy ${policy_id}"
+  echo "Updating security headers on response headers policy ${policy_id}"
   etag="$(aws cloudfront get-response-headers-policy --id "$policy_id" --query ETag --output text)"
   config="$(
     aws cloudfront get-response-headers-policy \
@@ -34,7 +38,24 @@ for policy_id in "${POLICY_IDS[@]}"; do
       --query ResponseHeadersPolicy.ResponseHeadersPolicyConfig \
       --output json
   )"
-  updated_config="$(jq --arg csp "$CSP" '.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy = $csp' <<<"$config")"
+  updated_config="$(
+    jq \
+      --arg csp "$CSP" \
+      --arg corp "$CORP" \
+      '
+        .SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy = $csp
+        | .CustomHeadersConfig.Items = (
+            ((.CustomHeadersConfig.Items // [])
+              | map(select(.Header != "Cross-Origin-Resource-Policy")))
+            + [{
+                Header: "Cross-Origin-Resource-Policy",
+                Value: $corp,
+                Override: true
+              }]
+          )
+        | .CustomHeadersConfig.Quantity = (.CustomHeadersConfig.Items | length)
+      ' <<<"$config"
+  )"
   aws cloudfront update-response-headers-policy \
     --id "$policy_id" \
     --if-match "$etag" \
@@ -42,4 +63,4 @@ for policy_id in "${POLICY_IDS[@]}"; do
     >/dev/null
 done
 
-echo "CloudFront CSP synced"
+echo "CloudFront CSP + CORP synced"

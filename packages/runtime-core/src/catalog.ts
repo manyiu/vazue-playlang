@@ -98,7 +98,7 @@ WHERE n % 2 = 1;
     example: `squares = (1..5).map { |n| n * n }
 puts "Hello, Playlang"
 puts squares.inspect
-puts squares.reduce(0, :+)
+puts squares.reduce(0) { |acc, n| acc + n }
 `,
     coldStartHint: "First run may take 15–30s while Ruby downloads.",
   },
@@ -174,7 +174,7 @@ print(nums ^ 2)
 using System.Linq;
 
 var numbers = new[] { 1, 2, 3, 4, 5 };
-var total = numbers.Where(n => n % 2 == 1).Select(n => n * n).Sum();
+var total = numbers.Where(n => n % 2 == 1).Select(n => n * n).Sum(n => n);
 
 Console.WriteLine("Hello, Playlang");
 Console.WriteLine(total);

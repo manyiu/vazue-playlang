@@ -35,6 +35,11 @@ export const WASMSHARP_COMLINK_CDN =
 /** SharedArrayBuffer for Popcorn; credentialless keeps CheerpJ iframes workable. */
 export const PLAYLANG_COEP = "credentialless";
 export const PLAYLANG_COOP = "same-origin";
+/**
+ * Opaque sandboxed iframes (allow-scripts without allow-same-origin) are treated
+ * as cross-origin under COEP, so /js-sandbox.html must opt in with CORP.
+ */
+export const PLAYLANG_CORP = "cross-origin";
 
 function directive(name: string, values: string[]): string {
   return `${name} ${values.join(" ")}`;

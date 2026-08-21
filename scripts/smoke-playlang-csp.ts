@@ -1,6 +1,7 @@
 import {
   PLAYLANG_COEP,
   PLAYLANG_COOP,
+  PLAYLANG_CORP,
   playlangContentSecurityPolicy,
 } from "../infra/cdk/lib/playlang-security.ts";
 
@@ -50,11 +51,18 @@ async function smokeOnce(): Promise<string[]> {
 
   expectHeader(headers, "cross-origin-embedder-policy", PLAYLANG_COEP, errors);
   expectHeader(headers, "cross-origin-opener-policy", PLAYLANG_COOP, errors);
+  expectHeader(headers, "cross-origin-resource-policy", PLAYLANG_CORP, errors);
 
   const sandboxHtmlResponse = await fetch(`${BASE_URL}/js-sandbox.html`, { redirect: "follow" });
   if (!sandboxHtmlResponse.ok) {
     errors.push(`GET /js-sandbox.html failed: ${sandboxHtmlResponse.status}`);
   } else {
+    expectHeader(
+      sandboxHtmlResponse.headers,
+      "cross-origin-resource-policy",
+      PLAYLANG_CORP,
+      errors,
+    );
     const html = await sandboxHtmlResponse.text();
     if (!html.includes('src="./js-sandbox.js"')) {
       errors.push("/js-sandbox.html must load guest code from ./js-sandbox.js");

@@ -29,9 +29,11 @@ let handlePromise: Promise<WebRHandle> | undefined;
 
 async function ensureWebR(): Promise<WebRHandle> {
   handlePromise ??= (async () => {
+    // Prefer SharedArrayBuffer when cross-origin isolated (COEP+COOP). Forcing
+    // PostMessage logs a console warning and disables interrupt / nested REPLs.
     const webR = new WebR({
       baseUrl: WEBR_BASE_URL,
-      channelType: ChannelType.PostMessage,
+      channelType: ChannelType.Automatic,
     }) as unknown as WebRHandle;
     await webR.init();
     return webR;

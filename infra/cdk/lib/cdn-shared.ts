@@ -4,6 +4,7 @@ import type { Construct } from "constructs";
 import {
   PLAYLANG_COEP,
   PLAYLANG_COOP,
+  PLAYLANG_CORP,
   playlangContentSecurityPolicy,
 } from "./playlang-security";
 
@@ -12,6 +13,7 @@ export {
   JSDELIVR_ORIGIN,
   PLAYLANG_COEP,
   PLAYLANG_COOP,
+  PLAYLANG_CORP,
   RUNTIME_CONNECT_SRC,
   RUNTIME_SCRIPT_ORIGINS,
   WASMSHARP_COMLINK_CDN,
@@ -61,6 +63,11 @@ function createPlaylangResponseHeadersPolicy(
     {
       header: "Cross-Origin-Embedder-Policy",
       value: PLAYLANG_COEP,
+      override: true,
+    },
+    {
+      header: "Cross-Origin-Resource-Policy",
+      value: PLAYLANG_CORP,
       override: true,
     },
   ];

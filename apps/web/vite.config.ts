@@ -8,6 +8,7 @@ import { popcorn } from "@swmansion/popcorn/vite";
 import {
   PLAYLANG_COEP,
   PLAYLANG_COOP,
+  PLAYLANG_CORP,
   playlangContentSecurityPolicy,
 } from "../../infra/cdk/lib/playlang-security.ts";
 import {
@@ -30,6 +31,7 @@ function playlangSecurityHeaders(): Plugin {
   }) => {
     res.setHeader("Cross-Origin-Opener-Policy", PLAYLANG_COOP);
     res.setHeader("Cross-Origin-Embedder-Policy", PLAYLANG_COEP);
+    res.setHeader("Cross-Origin-Resource-Policy", PLAYLANG_CORP);
     res.setHeader("Referrer-Policy", "no-referrer");
     res.setHeader("X-Content-Type-Options", "nosniff");
   };
@@ -59,6 +61,7 @@ const isolationHeaders = {
   "X-Content-Type-Options": "nosniff",
   "Cross-Origin-Opener-Policy": PLAYLANG_COOP,
   "Cross-Origin-Embedder-Policy": PLAYLANG_COEP,
+  "Cross-Origin-Resource-Policy": PLAYLANG_CORP,
 };
 
 const previewSecurityHeaders = {
