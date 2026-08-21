@@ -1,10 +1,22 @@
 import { expect, test } from "@playwright/test";
-import { encodeShare } from "@playlang/runtime-core";
+import { encodeShare, languageById } from "@playlang/runtime-core";
 import {
   PLAYLANG_COEP,
   PLAYLANG_COOP,
   playlangContentSecurityPolicy,
 } from "../../../infra/cdk/lib/playlang-security.ts";
+
+function catalogShare(languageId: string) {
+  const language = languageById(languageId);
+  if (!language) {
+    throw new Error(`Unknown language: ${languageId}`);
+  }
+  return encodeShare({
+    v: 1,
+    languageId: language.id,
+    files: { [language.examplePath]: language.example },
+  });
+}
 
 test("serves production CSP so sandboxes cannot rely on inline scripts", { tag: "@ci" }, async ({
   request,
@@ -133,17 +145,13 @@ test("loads a shared snapshot from the URL hash", { tag: "@ci" }, async ({ page 
 });
 
 test("runs TypeScript from a share link", { tag: "@ci" }, async ({ page }) => {
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "typescript",
-    files: {
-      "main.ts": "const n: number = 40;\nconsole.log(n + 2);\n",
-    },
-  });
+  const { hash } = catalogShare("typescript");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
-  await expect(page.getByTestId("output")).toContainText("42", { timeout: 20_000 });
+  await expect(page.getByTestId("output")).toContainText("Hello, Playlang", {
+    timeout: 20_000,
+  });
   await expect(page.getByTestId("output")).not.toContainText("Timed out");
 });
 
@@ -235,11 +243,7 @@ test("surfaces TypeScript compile errors without executing", { tag: "@ci" }, asy
 });
 
 test("runs Lua from a share link", { tag: "@ci" }, async ({ page }) => {
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "lua",
-    files: { "main.lua": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
-  });
+  const { hash } = catalogShare("lua");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -250,11 +254,7 @@ test("runs Lua from a share link", { tag: "@ci" }, async ({ page }) => {
 });
 
 test("runs SQL from a share link", { tag: "@ci" }, async ({ page }) => {
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "sql",
-    files: { "query.sql": "SELECT 'Hello, Playlang' AS greeting;" },
-  });
+  const { hash } = catalogShare("sql");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -266,11 +266,7 @@ test("runs SQL from a share link", { tag: "@ci" }, async ({ page }) => {
 
 test("runs Python from a share link", async ({ page }) => {
   test.setTimeout(120_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "python",
-    files: { "main.py": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
-  });
+  const { hash } = catalogShare("python");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -281,11 +277,7 @@ test("runs Python from a share link", async ({ page }) => {
 
 test("runs Ruby from a share link", async ({ page }) => {
   test.setTimeout(120_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "ruby",
-    files: { "main.rb": 'puts "Hello, Playlang"\nputs 2 + 2\n' },
-  });
+  const { hash } = catalogShare("ruby");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -296,11 +288,7 @@ test("runs Ruby from a share link", async ({ page }) => {
 
 test("runs PHP from a share link", async ({ page }) => {
   test.setTimeout(120_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "php",
-    files: { "main.php": '<?php\necho "Hello, Playlang\\n";\necho 2 + 2;\n' },
-  });
+  const { hash } = catalogShare("php");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -311,14 +299,7 @@ test("runs PHP from a share link", async ({ page }) => {
 
 test("runs Go from a share link", async ({ page }) => {
   test.setTimeout(180_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "go",
-    files: {
-      "main.go":
-        'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("Hello, Playlang")\n\tfmt.Println(2 + 2)\n}\n',
-    },
-  });
+  const { hash } = catalogShare("go");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -329,11 +310,7 @@ test("runs Go from a share link", async ({ page }) => {
 
 test("runs R from a share link", async ({ page }) => {
   test.setTimeout(180_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "r",
-    files: { "main.R": 'print("Hello, Playlang")\nprint(2 + 2)\n' },
-  });
+  const { hash } = catalogShare("r");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -344,14 +321,7 @@ test("runs R from a share link", async ({ page }) => {
 
 test("runs C# from a share link", async ({ page }) => {
   test.setTimeout(180_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "csharp",
-    files: {
-      "Program.cs":
-        'using System;\n\nConsole.WriteLine("Hello, Playlang");\nConsole.WriteLine(2 + 2);\n',
-    },
-  });
+  const { hash } = catalogShare("csharp");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
@@ -362,20 +332,13 @@ test("runs C# from a share link", async ({ page }) => {
 
 test("runs Java from a share link", async ({ page }) => {
   test.setTimeout(180_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "java",
-    files: {
-      "Main.java":
-        'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Playlang");\n    System.out.println(2 + 2);\n  }\n}\n',
-    },
-  });
+  const { hash } = catalogShare("java");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   const output = page.getByTestId("output");
   await expect(output).toContainText("Hello, Playlang", { timeout: 150_000 });
-  await expect(output).toContainText("4");
+  await expect(output).toContainText("55");
 });
 
 test("surfaces Java compile errors", async ({ page }) => {
@@ -416,20 +379,13 @@ test("runs Java with a package declaration", async ({ page }) => {
 
 test("runs C++ from a share link", async ({ page }) => {
   test.setTimeout(240_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "cpp",
-    files: {
-      "main.cpp":
-        '#include <iostream>\nint main() {\n  std::cout << "Hello, Playlang" << std::endl;\n  std::cout << 2 + 2 << std::endl;\n}\n',
-    },
-  });
+  const { hash } = catalogShare("cpp");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   const output = page.getByTestId("output");
   await expect(output).toContainText("Hello, Playlang", { timeout: 200_000 });
-  await expect(output).toContainText("4");
+  await expect(output).toContainText("25");
 });
 
 test("runs C from a share link", async ({ page }) => {
@@ -453,19 +409,13 @@ test("runs C from a share link", async ({ page }) => {
 
 test("runs Elixir from a share link", async ({ page }) => {
   test.setTimeout(180_000);
-  const { hash } = encodeShare({
-    v: 1,
-    languageId: "elixir",
-    files: {
-      "main.exs": 'IO.puts("Hello, Playlang")\nIO.puts(2 + 2)\n',
-    },
-  });
+  const { hash } = catalogShare("elixir");
   await page.goto(`/#${hash}`);
   await expect(page.getByTestId("run")).toBeEnabled();
   await page.getByTestId("run").click();
   const output = page.getByTestId("output");
   await expect(output).toContainText("Hello, Playlang", { timeout: 150_000 });
-  await expect(output).toContainText("4");
+  await expect(output).toContainText("55");
 });
 
 test("Copy link writes a hash URL that round-trips", { tag: "@ci" }, async ({ page, context }) => {

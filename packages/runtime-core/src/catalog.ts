@@ -12,10 +12,11 @@ export const LANGUAGES: LanguageInfo[] = [
     status: "available",
     guestNetwork: true,
     examplePath: "main.js",
-    example: `const greet = (name) => \`Hello, \${name}\`;
+    example: `const user = { name: "Playlang", role: "guest", active: true };
+const { name, ...rest } = user;
 
-console.log(greet("Playlang"));
-console.log("2 + 2 =", 2 + 2);
+console.log(\`Hello, \${name}\`);
+console.log("extra keys:", Object.keys(rest).join(", "));
 `,
   },
   {
@@ -27,10 +28,14 @@ console.log("2 + 2 =", 2 + 2);
     status: "available",
     guestNetwork: true,
     examplePath: "main.ts",
-    example: `const greet = (name: string): string => \`Hello, \${name}\`;
+    example: `interface User {
+  name: string;
+  role: string;
+}
 
-console.log(greet("Playlang"));
-console.log("2 + 2 =", 2 + 2);
+const greet = (user: User): string => \`Hello, \${user.name}\`;
+
+console.log(greet({ name: "Playlang", role: "guest" }));
 `,
   },
   {
@@ -42,8 +47,9 @@ console.log("2 + 2 =", 2 + 2);
     status: "available",
     guestNetwork: true,
     examplePath: "main.py",
-    example: `print("Hello, Playlang")
-print(2 + 2)
+    example: `squares = [n * n for n in range(1, 6)]
+print("Hello, Playlang")
+print(squares)
 `,
     coldStartHint: "First run may take 15–30s while Python downloads.",
   },
@@ -56,8 +62,11 @@ print(2 + 2)
     status: "available",
     guestNetwork: false,
     examplePath: "main.lua",
-    example: `print("Hello, Playlang")
-print(2 + 2)
+    example: `local user = { name = "Playlang", role = "guest" }
+print("Hello, " .. user.name)
+for key, value in pairs(user) do
+  print(key, value)
+end
 `,
   },
   {
@@ -69,7 +78,12 @@ print(2 + 2)
     status: "available",
     guestNetwork: false,
     examplePath: "query.sql",
-    example: `SELECT 'Hello, Playlang' AS greeting, 2 + 2 AS sum;
+    example: `WITH nums(n) AS (
+  VALUES (1), (2), (3), (4), (5)
+)
+SELECT 'Hello, Playlang' AS greeting, n, n * n AS square
+FROM nums
+WHERE n % 2 = 1;
 `,
   },
   {
@@ -81,8 +95,10 @@ print(2 + 2)
     status: "available",
     guestNetwork: false,
     examplePath: "main.rb",
-    example: `puts "Hello, Playlang"
-puts 2 + 2
+    example: `squares = (1..5).map { |n| n * n }
+puts "Hello, Playlang"
+puts squares.inspect
+puts squares.reduce(0, :+)
 `,
     coldStartHint: "First run may take 15–30s while Ruby downloads.",
   },
@@ -96,8 +112,9 @@ puts 2 + 2
     guestNetwork: true,
     examplePath: "main.php",
     example: `<?php
-echo "Hello, Playlang\\n";
-echo 2 + 2;
+$user = ["name" => "Playlang", "role" => "guest"];
+echo "Hello, {$user['name']}\\n";
+echo implode(", ", array_keys($user));
 `,
     coldStartHint: "First run may take 15–30s while PHP downloads.",
   },
@@ -114,9 +131,17 @@ echo 2 + 2;
 
 import "fmt"
 
+type Greeter struct {
+	Name string
+}
+
+func (g Greeter) Hello() string {
+	return "Hello, " + g.Name
+}
+
 func main() {
-	fmt.Println("Hello, Playlang")
-	fmt.Println(2 + 2)
+	g := Greeter{Name: "Playlang"}
+	fmt.Println(g.Hello())
 }
 `,
     coldStartHint: "First run may take 30–60s while Go downloads.",
@@ -130,8 +155,9 @@ func main() {
     status: "available",
     guestNetwork: true,
     examplePath: "main.R",
-    example: `print("Hello, Playlang")
-print(2 + 2)
+    example: `nums <- 1:5
+print("Hello, Playlang")
+print(nums ^ 2)
 `,
     coldStartHint: "First run may take 30–60s while R downloads.",
   },
@@ -145,9 +171,13 @@ print(2 + 2)
     guestNetwork: true,
     examplePath: "Program.cs",
     example: `using System;
+using System.Linq;
+
+var numbers = new[] { 1, 2, 3, 4, 5 };
+var total = numbers.Where(n => n % 2 == 1).Select(n => n * n).Sum();
 
 Console.WriteLine("Hello, Playlang");
-Console.WriteLine(2 + 2);
+Console.WriteLine(total);
 `,
     coldStartHint: "First run may take 30–90s while C# downloads.",
   },
@@ -160,10 +190,13 @@ Console.WriteLine(2 + 2);
     status: "available",
     guestNetwork: true,
     examplePath: "Main.java",
-    example: `public class Main {
+    example: `import java.util.stream.IntStream;
+
+public class Main {
   public static void main(String[] args) {
+    int total = IntStream.rangeClosed(1, 5).map(n -> n * n).sum();
     System.out.println("Hello, Playlang");
-    System.out.println(2 + 2);
+    System.out.println(total);
   }
 }
 `,
@@ -179,9 +212,14 @@ Console.WriteLine(2 + 2);
     guestNetwork: true,
     examplePath: "main.cpp",
     example: `#include <iostream>
+#include <vector>
+
 int main() {
+  std::vector<int> nums = {1, 2, 3, 4, 5};
   std::cout << "Hello, Playlang" << std::endl;
-  std::cout << 2 + 2 << std::endl;
+  for (int n : nums) {
+    std::cout << (n * n) << std::endl;
+  }
 }
 `,
     coldStartHint: "First run may take 60–180s while C/C++ downloads.",
@@ -195,8 +233,13 @@ int main() {
     status: "available",
     guestNetwork: true,
     examplePath: "main.exs",
-    example: `IO.puts("Hello, Playlang")
-IO.puts(2 + 2)
+    example: `total =
+  1..5
+  |> Enum.map(&(&1 * &1))
+  |> Enum.sum()
+
+IO.puts("Hello, Playlang")
+IO.puts(total)
 `,
     coldStartHint: "First run may take 30–90s while Elixir downloads.",
   },

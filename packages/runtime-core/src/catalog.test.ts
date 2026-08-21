@@ -31,7 +31,9 @@ describe("language catalog", () => {
       guestNetwork: true,
       examplePath: "Main.java",
     });
+    expect(java?.example).toMatch(/IntStream/);
     expect(java?.example).toMatch(/System\.out\.println\("Hello, Playlang"\)/);
+    expect(java?.example).toMatch(/public class Main/);
   });
 
   it("describes C/C++ as browsercc and Elixir as Popcorn", () => {
