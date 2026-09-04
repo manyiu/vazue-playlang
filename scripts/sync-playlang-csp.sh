@@ -29,6 +29,13 @@ fi
 
 echo "Syncing CSP + CORP onto ${#POLICY_IDS[@]} response header policies"
 
+# AWS get-response-headers-policy can return XSSProtection / FrameOptions stubs
+# without Override (and sibling fields). update-response-headers-policy then
+# rejects the config. Drop incomplete blocks; Playlang does not configure them.
+transform_policy_config() {
+  jq --arg csp "$CSP" --arg corp "$CORP" -f "$ROOT/scripts/sync-playlang-csp.jq"
+}
+
 for policy_id in "${POLICY_IDS[@]}"; do
   echo "Updating security headers on response headers policy ${policy_id}"
   etag="$(aws cloudfront get-response-headers-policy --id "$policy_id" --query ETag --output text)"
@@ -38,24 +45,7 @@ for policy_id in "${POLICY_IDS[@]}"; do
       --query ResponseHeadersPolicy.ResponseHeadersPolicyConfig \
       --output json
   )"
-  updated_config="$(
-    jq \
-      --arg csp "$CSP" \
-      --arg corp "$CORP" \
-      '
-        .SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy = $csp
-        | .CustomHeadersConfig.Items = (
-            ((.CustomHeadersConfig.Items // [])
-              | map(select(.Header != "Cross-Origin-Resource-Policy")))
-            + [{
-                Header: "Cross-Origin-Resource-Policy",
-                Value: $corp,
-                Override: true
-              }]
-          )
-        | .CustomHeadersConfig.Quantity = (.CustomHeadersConfig.Items | length)
-      ' <<<"$config"
-  )"
+  updated_config="$(transform_policy_config <<<"$config")"
   aws cloudfront update-response-headers-policy \
     --id "$policy_id" \
     --if-match "$etag" \
