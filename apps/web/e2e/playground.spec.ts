@@ -124,6 +124,38 @@ test("webR worker is not blocked by CSP", { tag: "@ci" }, async ({ page }) => {
   );
 });
 
+test("CheerpJ assets are not blocked by CSP", { tag: "@ci" }, async ({ page, request }) => {
+  const toolsJar = await request.get("/tools.jar", { failOnStatusCode: false });
+  expect(toolsJar.ok(), `tools.jar status ${toolsJar.status()}`).toBeTruthy();
+
+  const cspHits: string[] = [];
+  page.on("console", (msg) => {
+    const text = msg.text();
+    if (
+      /Content-Security-Policy/i.test(text) &&
+      /cheerpj|cjrtnc|leaningtech|style-src|frame-src|worker-src/i.test(text)
+    ) {
+      cspHits.push(text);
+    }
+  });
+  const { hash } = encodeShare({
+    v: 1,
+    languageId: "java",
+    files: {
+      "Main.java":
+        'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Playlang");\n  }\n}\n',
+    },
+  });
+  await page.goto(`/#${hash}`);
+  await expect(page.getByTestId("run")).toBeEnabled();
+  await page.getByTestId("run").click();
+  await expect(page.getByTestId("output")).toContainText(
+    /Loading Java|Hello, Playlang|error|Failed|Timed out/i,
+    { timeout: 8_000 },
+  );
+  expect(cspHits, cspHits.join("\n")).toEqual([]);
+});
+
 test("runs the default JavaScript example", { tag: "@ci" }, async ({ page }) => {
   await page.goto("/");
   await expect(page.getByTestId("run")).toBeEnabled();

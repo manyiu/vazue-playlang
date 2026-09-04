@@ -62,3 +62,8 @@ jobs:
 
       - name: Smoke test production CSP and site
         run: bash scripts/smoke-playlang-csp.sh
+
+      - name: Smoke test every language on production
+        run: bash scripts/smoke-playlang-languages.sh
+        env:
+          PLAYLANG_URL: https://playlang.vazue.com

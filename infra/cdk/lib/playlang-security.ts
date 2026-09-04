@@ -60,7 +60,8 @@ export function playlangContentSecurityPolicy(): string {
       "'wasm-unsafe-eval'",
       ...RUNTIME_SCRIPT_ORIGINS,
     ]),
-    "style-src 'self' 'unsafe-inline'",
+    // CheerpJ injects cheerpj.css from its Community CDN during cheerpjInit.
+    directive("style-src", ["'self'", "'unsafe-inline'", CHEERPJ_CDN_ORIGIN]),
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     `connect-src 'self' ${RUNTIME_CONNECT_SRC.join(" ")}`,

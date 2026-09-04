@@ -47,6 +47,7 @@ describe("Playlang CSP", () => {
     expect(csp).toContain("'wasm-unsafe-eval'");
     expect(directive(csp, "frame-src")).toContain(CHEERPJ_CDN_ORIGIN);
     expect(directive(csp, "frame-src")).toContain("blob:");
+    expect(directive(csp, "style-src")).toContain(CHEERPJ_CDN_ORIGIN);
   });
 
   it("allows unsafe-eval for the JS/TS guest AsyncFunction sandbox", () => {

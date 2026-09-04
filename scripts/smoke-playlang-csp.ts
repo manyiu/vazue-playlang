@@ -87,6 +87,25 @@ async function smokeOnce(): Promise<string[]> {
     errors.push("GET / did not return the Playlang SPA shell");
   }
 
+  // Java (CheerpJ) needs site-root tools.jar on the /app mount plus CDN styles.
+  if (csp && !/style-src[^;]*https:\/\/cjrtnc\.leaningtech\.com/i.test(csp)) {
+    errors.push("content-security-policy style-src missing CheerpJ CDN (blocks cheerpj.css)");
+  }
+
+  const toolsJarResponse = await fetch(`${BASE_URL}/tools.jar`, {
+    method: "HEAD",
+    redirect: "follow",
+  });
+  if (!toolsJarResponse.ok) {
+    errors.push(`HEAD /tools.jar failed: ${toolsJarResponse.status}`);
+  } else {
+    expectHeader(toolsJarResponse.headers, "cross-origin-resource-policy", PLAYLANG_CORP, errors);
+    const length = toolsJarResponse.headers.get("content-length");
+    if (length && Number(length) < 1_000_000) {
+      errors.push(`/tools.jar looks too small (${length} bytes)`);
+    }
+  }
+
   return errors;
 }
 

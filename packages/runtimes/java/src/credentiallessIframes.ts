@@ -13,6 +13,16 @@ export function isCheerpJIframeSrc(src: string): boolean {
   }
 }
 
+/** Must run before navigation — credentialless has no effect after src is applied. */
+export function markCredentialless(el: HTMLIFrameElement): void {
+  try {
+    (el as HTMLIFrameElement & { credentialless?: boolean }).credentialless =
+      true;
+  } catch {
+    // Older browsers without the attribute — CheerpJ may still fail under COEP.
+  }
+}
+
 /**
  * Under COEP (needed for Popcorn/AtomVM), cross-origin iframes are blocked unless
  * they send COEP themselves. CheerpJ's CDN `c.html` does not. Mark only those
@@ -27,12 +37,7 @@ export function enableCredentiallessIframes(): void {
     if (!(el instanceof HTMLIFrameElement) || marked.has(el)) return;
     if (!isCheerpJIframeSrc(el.src)) return;
     marked.add(el);
-    try {
-      (el as HTMLIFrameElement & { credentialless?: boolean }).credentialless =
-        true;
-    } catch {
-      // Older browsers without the attribute — CheerpJ may still fail under COEP.
-    }
+    markCredentialless(el);
   };
 
   const originalSetAttribute = HTMLIFrameElement.prototype.setAttribute;
@@ -40,6 +45,9 @@ export function enableCredentiallessIframes(): void {
     name: string,
     value: string,
   ) {
+    if (name.toLowerCase() === "src" && isCheerpJIframeSrc(value)) {
+      markCredentialless(this);
+    }
     originalSetAttribute.call(this, name, value);
     if (name.toLowerCase() === "src") mark(this);
   };
@@ -57,6 +65,9 @@ export function enableCredentiallessIframes(): void {
         return get.call(this);
       },
       set(value: string) {
+        if (isCheerpJIframeSrc(String(value))) {
+          markCredentialless(this);
+        }
         set.call(this, value);
         mark(this);
       },

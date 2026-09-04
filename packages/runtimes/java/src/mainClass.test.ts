@@ -45,6 +45,33 @@ describe("CheerpJ credentialless iframes", () => {
     );
     expect(isCheerpJIframeSrc("")).toBe(false);
   });
+
+  it("sets credentialless before applying a CheerpJ iframe src", async () => {
+    const order: string[] = [];
+    const iframe = {
+      credentialless: false,
+      src: "",
+    } as HTMLIFrameElement & { credentialless: boolean };
+
+    Object.defineProperty(iframe, "credentialless", {
+      configurable: true,
+      get() {
+        return false;
+      },
+      set() {
+        order.push("credentialless");
+      },
+    });
+
+    const { markCredentialless, isCheerpJIframeSrc } = await import(
+      "./credentiallessIframes.ts"
+    );
+    const src = "https://cjrtnc.leaningtech.com/4.3/c.html";
+    expect(isCheerpJIframeSrc(src)).toBe(true);
+    markCredentialless(iframe);
+    order.push("src");
+    expect(order).toEqual(["credentialless", "src"]);
+  });
 });
 
 describe("CheerpJ pins", () => {
