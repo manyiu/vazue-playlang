@@ -13,7 +13,7 @@
     "deploy:all": "cdk deploy --all"
   },
   "devDependencies": {
-    "@types/node": "^25.9.3",
+    "@types/node": "^26.2.0",
     "aws-cdk": "^2.1126.0",
     "aws-cdk-lib": "^2.259.0",
     "constructs": "^10.6.0",
